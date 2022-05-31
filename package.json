@@ -1,0 +1,23 @@
+{
+  "name": "heap2022-backend",
+  "version": "1.0.0",
+  "description": "This is a new project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DavinShee/HEAP2022-G2-BACKEND-.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DavinShee/HEAP2022-G2-BACKEND-/issues"
+  },
+  "homepage": "https://github.com/DavinShee/HEAP2022-G2-BACKEND-#readme",
+  "dependencies": {
+    "express": "^4.18.1",
+    "prettier": "^2.6.2"
+  }
+}
