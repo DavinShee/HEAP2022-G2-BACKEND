@@ -4,7 +4,8 @@
   "description": "This is a new project",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start" : "nodemon src/app.js"
   },
   "repository": {
     "type": "git",
@@ -23,5 +24,8 @@
     "mongoose": "^6.3.5",
     "prettier": "^2.6.2",
     "watch": "^1.0.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.16"
   }
 }
