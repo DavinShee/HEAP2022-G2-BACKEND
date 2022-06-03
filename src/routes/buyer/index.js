@@ -1,21 +1,22 @@
 const { Router } = require('express');
 const express = require('express');
+const { type } = require('express/lib/response');
 const moment = require('moment');
-const { findAllNotes } = require('../../utils');
+const { findAllNotes } = require('../../utils/index');
 
 const router = express.Router();
 
 router.get('/', async (req, res) => {
     try {
         const modId = req.query['mod-id'];
-        const profId = req.query['prof-id'];
-        const authordId = req.query['author-id'];
+        const profName = req.query['prof-name'];
+        const authorName = req.query['author-name'];
 
         const conditions = {};
         if (modId) conditions.modId = modId;
-        if (profId) conditions.profId = profId;
-        if (authordId) conditions.authordId = authordId;
-        const [findAllNotesError, notes] = findAllNotes(conditions);
+        if (profName) conditions.profId = profId;
+        if (authorName) conditions.authordId = authordId;
+        const [findAllNotesError, notes] = await findAllNotes(conditions);
 
         if (findAllNotesError) {
             throw new Error('Error retrieving all notes', conditions);
