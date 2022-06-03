@@ -3,8 +3,8 @@ const mongoose = require('mongoose');
 const noteSchema = new mongoose.Schema(
     {
         modId: { type: String, required: true },
-        profId: { type: String, required: true },
-        authorId: { type: String, required: true }
+        profName: { type: String, required: true },
+        authorName: { type: String, required: true }
     },
     { timestamps: true }
 );
