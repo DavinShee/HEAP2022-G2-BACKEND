@@ -1,1 +1,3 @@
-This is a new project
+# HEAP backend
+
+To start app: npm run start
