@@ -2,8 +2,7 @@ const { Router } = require('express');
 const express = require('express');
 const { type } = require('express/lib/response');
 const moment = require('moment');
-
-const { findAllNotes, createNote } = require('../../utils/index');
+const { findAllNotes } = require('../../utils/index');
 
 const router = express.Router();
 
@@ -31,38 +30,7 @@ router.get('/', async (req, res) => {
         };
         res.json(response);
     } catch (error) {
-        console.error('Error getting notes', error);
-        res.json('Error getting notes');
-    }
-});
-
-router.post('/', async (req, res) => {
-    try {
-        if (!req.body.modId || !req.body.profName || !req.body.authorName) {
-            throw new Error('Missing parameters');
-        }
-        const modId = req.body.modId;
-        const profName = req.body.profName;
-        const authorName = req.body.authorName;
-        const [createNoteError, note] = await createNote(
-            modId,
-            profName,
-            authorName
-        );
-        if (createNoteError) {
-            throw createNoteError;
-        }
-        const response = {
-            status: 200,
-            timestamp: moment().format(),
-            data: {
-                note
-            }
-        };
-        res.json(response);
-    } catch (error) {
-        console.error('Error creating note', error);
-        res.json(`Error creating note: ${error}`);
+        console.error(error);
     }
 });
 module.exports = router;
