@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const notesModel = require('../models/notes');
+const { notesModel, usersModel } = require('../models/notes');
 
 module.exports = {
     findAllNotes: async (conditions) => {
@@ -38,6 +38,29 @@ module.exports = {
             return [undefined, note];
         } catch (error) {
             console.error('Error creating note', error);
+            return [error, null];
+        }
+    },
+    findUser: async (conditions) => {
+        try {
+            const query = usersModel.find(conditions);
+            query.sort({ createdAt: -1 });
+ 
+            const user = await query.exec();
+            return [undefined, user];
+        } catch (error) {
+            console.error('Error retrieving account', conditions, error);
+            return [error, null];
+        }
+    },
+    createUser: async (email, password) => {
+        try {
+            const temp = { email, password };
+            let user = new usersModel(temp);
+            user = await user.save();
+            return [undefined, user];
+        } catch (error) {
+            console.error('Error creating account', error);
             return [error, null];
         }
     }
