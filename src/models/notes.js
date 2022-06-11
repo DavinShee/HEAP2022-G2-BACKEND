@@ -25,5 +25,6 @@ noteSchema.index({ authorId: 1 });
 noteSchema.index({ modId: 1 });
 noteSchema.index({ profId: 1 });
 
+const notesModel = mongoose.model('notes', noteSchema);
 const usersModel = mongoose.model('users', userSchema);
 module.exports = { notesModel, usersModel };
