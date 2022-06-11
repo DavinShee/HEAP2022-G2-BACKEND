@@ -36,16 +36,33 @@ router.get('/', async (req, res) => {
 });
 router.post('/', async (req, res) => {
     try {
-        if (!req.body.modId || !req.body.profName || !req.body.authorName) {
+        if (
+            !req.body.modId ||
+            !req.body.profName ||
+            !req.body.authorName ||
+            !req.body.year ||
+            !req.body.price ||
+            !req.body.description ||
+            !req.body.image
+        ) {
             throw new Error('Missing parameters');
         }
-        const modId = req.body.modId;
-        const profName = req.body.profName;
         const authorName = req.body.authorName;
+        const description = req.body.description;
+        const image = req.body.image;
+        const modId = req.body.modId;
+        const price = req.body.price;
+        const profName = req.body.profName;
+        const year = req.body.year;
+
         const [createNoteError, note] = await createNote(
+            authorName,
+            description,
+            image,
             modId,
+            price,
             profName,
-            authorName
+            year
         );
         if (createNoteError) {
             throw createNoteError;
@@ -63,4 +80,5 @@ router.post('/', async (req, res) => {
         res.json(`Error creating note: ${error}`);
     }
 });
+
 module.exports = router;

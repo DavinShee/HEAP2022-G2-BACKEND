@@ -14,9 +14,25 @@ module.exports = {
             return [error, null];
         }
     },
-    createNote: async (modId, profName, authorName) => {
+    createNote: async (
+        authorName,
+        description,
+        image,
+        modId,
+        price,
+        profName,
+        year
+    ) => {
         try {
-            const doc = { modId, profName, authorName };
+            const doc = {
+                authorName,
+                description,
+                image,
+                modId,
+                price,
+                profName,
+                year
+            };
             let note = new notesModel(doc);
             note = await note.save();
             return [undefined, note];
