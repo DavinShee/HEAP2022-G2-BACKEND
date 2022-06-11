@@ -1,5 +1,6 @@
 require('dotenv').config();
 const bodyParser = require('body-parser');
+const cors = require('cors');
 const express = require('express');
 const moment = require('moment');
 const mongoose = require('mongoose');
@@ -14,6 +15,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/routes', route);
 app.use(express.json());
 
+app.use(cors());
 mongoose.connect('mongodb://localhost:27017/HEAP', {
     useNewUrlParser: true
 });
