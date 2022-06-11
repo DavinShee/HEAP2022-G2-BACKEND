@@ -14,8 +14,8 @@ router.get('/', async (req, res) => {
 
         const conditions = {};
         if (modId) conditions.modId = modId;
-        if (profName) conditions.profId = profId;
-        if (authorName) conditions.authordId = authordId;
+        if (profName) conditions.profName = profName;
+        if (authorName) conditions.authorName = authorName;
         const [findAllNotesError, notes] = await findAllNotes(conditions);
 
         if (findAllNotesError) {
