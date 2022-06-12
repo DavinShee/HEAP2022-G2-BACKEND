@@ -137,4 +137,38 @@ router.patch('/:modId/:profName/:authorName', async (req, res) => {
     }
 });
 
+router.delete('/:modId/:profName/:authorName', async (req, res) => {
+    try {
+        if (
+            !req.params.modId &&
+            !req.params.profName &&
+            !req.params.authorName
+        ) {
+            throw new Error('Missing parameters');
+        }
+
+        const conditions = {
+            modId: req.params.modId,
+            profName: req.params.profName,
+            authorName: req.params.authorName
+        };
+
+        const [error, note] = await findAndDeleteNote(conditions);
+        if (error) {
+            throw new Error('Error deleting note', conditions);
+        }
+        const response = {
+            status: 200,
+            timestamp: moment().format(),
+            data: {
+                note
+            }
+        };
+        res.json(response);
+    } catch (error) {
+        console.error('Error getting notes', error);
+        res.json('Error getting notes');
+    }
+});
+
 module.exports = router;
