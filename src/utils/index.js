@@ -41,11 +41,33 @@ module.exports = {
             return [error, null];
         }
     },
+    findAndUpdateNote: async (conditions, update) => {
+        try {
+            let doc = await notesModel
+                .findOneAndUpdate(conditions, update, {
+                    new: true
+                })
+                .exec();
+            return [undefined, doc];
+        } catch (error) {
+            console.error('Error updating note', error);
+            return [error, null];
+        }
+    },
+    findAndDeleteNote: async (conditions) => {
+        try {
+            let doc = await notesModel.findOneAndDelete(conditions).exec();
+            return [undefined, doc];
+        } catch (error) {
+            console.error('Error deleting note', error);
+            return [error, null];
+        }
+    },
     findUser: async (conditions) => {
         try {
             const query = usersModel.find(conditions);
             query.sort({ createdAt: -1 });
- 
+
             const user = await query.exec();
             return [undefined, user];
         } catch (error) {
