@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
-const { notesModel, usersModel } = require('../models/notes');
+const bcrypt = require('bcrypt');
+const notesModel = require('../models/notes');
+const usersModel = require('../models/user');
 
 module.exports = {
     findAllNotes: async (conditions) => {
@@ -63,6 +65,7 @@ module.exports = {
             return [error, null];
         }
     },
+    // logging the user in
     findUser: async (conditions) => {
         try {
             const query = usersModel.find(conditions);
@@ -77,7 +80,9 @@ module.exports = {
     },
     createUser: async (email, password) => {
         try {
-            const temp = { email, password };
+            const salt = await bcrypt.genSalt(10);
+            const encryptedPassword = await bcrypt.hash(password, salt);
+            const temp = { email, encryptedPassword };
             let user = new usersModel(temp);
             user = await user.save();
             return [undefined, user];
@@ -86,4 +91,26 @@ module.exports = {
             return [error, null];
         }
     }
+    // findAndUpdateUser: async (conditions, update) => {
+    //     try {
+    //         let doc = await usersModel
+    //             .findOneAndUpdate(conditions, update, {
+    //                 new: true
+    //             })
+    //             .exec();
+    //         return [undefined, doc];
+    //     } catch (error) {
+    //         console.error('Error updating note', error);
+    //         return [error, null];
+    //     }
+    // },
+    // findAndDeleteUser: async (conditions) => {
+    //     try {
+    //         let doc = await notesModel.findOneAndDelete(conditions).exec();
+    //         return [undefined, doc];
+    //     } catch (error) {
+    //         console.error('Error deleting note', error);
+    //         return [error, null];
+    //     }
+    //},
 };
