@@ -3,11 +3,12 @@ const express = require('express');
 const { type } = require('express/lib/response');
 const moment = require('moment');
 const { findUser, createUser } = require('../../utils/index');
+const bcrypt = require("bcrypt");
  
 const router = express.Router();
  
 // finding user, logging user in
-router.get('/', async (req, res) => {
+router.get('/signin', async (req, res) => {
     try {
         const email = req.query['email'];
         const password = req.query['password'];
@@ -33,18 +34,25 @@ router.get('/', async (req, res) => {
         res.json('Error retrieving account');
     }
 });
-// creating user
-router.post('/', async (req, res) => {
+// signing up the user (creating account)
+router.post('/signup', async (req, res) => {  // note that the frontend has to route to signup
     try {
-        if (!req.body.email || !req.body.password) {
+        if (!req.body.email || !req.body.fullname || !req.body.password) {
             throw new Error('Missing parameters');
         }
         const email = req.body.email;
         const password = req.body.password;
-       
+        const fullname = req.body.fullname;
+        var today = new Date();
+        var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+        var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+        var dateTime = date+' '+time;
+
         const [createAccountError, user] = await createUser(
             email,
-            password
+            fullname,
+            password,
+            dateTime
         );
         if (createAccountError) {
             throw createAccountError;
