@@ -66,26 +66,38 @@ module.exports = {
         }
     },
     // logging the user in
-    findUser: async (conditions) => {
-        try {
-            const query = usersModel.find(conditions);
-            query.sort({ createdAt: -1 });
+    // findUser: async (conditions) => {
+    //     try {
+    //         const query = usersModel.find(conditions);
+    //         query.sort({ createdAt: -1 });
 
-            const user = await query.exec();
-            return [undefined, user];
-        } catch (error) {
-            console.error('Error retrieving account', conditions, error);
-            return [error, null];
-        }
-    },
-    createUser: async (email, password) => {
+    //         const user = await query.exec();
+    //         return [undefined, user];
+    //     } catch (error) {
+    //         console.error('Error retrieving account', conditions, error);
+    //         return [error, null];
+    //     }
+    // },
+    createUser: async (email, fullname, password, dateTime) => {
         try {
-            const salt = await bcrypt.genSalt(10);
-            const encryptedPassword = await bcrypt.hash(password, salt);
-            const temp = { email, encryptedPassword };
-            let user = new usersModel(temp);
-            user = await user.save();
-            return [undefined, user];
+            // checking if the fullname is unique
+            const check = await usersModel.find({ fullname: fullname }).exec();
+            if (check.length == 0) {
+                const doc = { email, fullname, password, dateTime };
+                let user = new usersModel(doc);
+
+                // generate salt to hash password
+                const salt = await bcrypt.genSalt(10);
+                // now we set user password to hashed password
+                user.password = await bcrypt.hash(user.password, salt);
+
+                user = await user.save();
+                return [undefined, user];   
+            } else {
+                console.error('Error creating account as fullname is taken');
+                error = 'Fullname is taken';
+                return [error, null];
+            }
         } catch (error) {
             console.error('Error creating account', error);
             return [error, null];
