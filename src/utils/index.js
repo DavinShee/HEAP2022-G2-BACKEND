@@ -66,23 +66,39 @@ module.exports = {
         }
     },
     // logging the user in
-    // findUser: async (conditions) => {
-    //     try {
-    //         const query = usersModel.find(conditions);
-    //         query.sort({ createdAt: -1 });
-
-    //         const user = await query.exec();
-    //         return [undefined, user];
-    //     } catch (error) {
-    //         console.error('Error retrieving account', conditions, error);
-    //         return [error, null];
-    //     }
-    // },
+    findUser: async (conditions) => { 
+        try { 
+            console.log(conditions)  // tbc: conditions is an object with the properties email 
+            const query = usersModel.findOne({ email: conditions.email }); 
+            query.sort({ createdAt: -1 }); 
+ 
+            const user = await query.exec(); 
+            if (user) { 
+                // check user password with hashed password stored in the database 
+                const validPassword = await bcrypt.compare(conditions.password, user.password); 
+                if (validPassword) { 
+                    return [undefined, user]; 
+                } else { 
+                    console.error('Error retrieving account', conditions); 
+                    error = "Invalid Password"; 
+                    return [error, null]; 
+                } 
+            } else { 
+                console.error('Error retrieving account', conditions); 
+                error = "User does not exist"; 
+                return [error, null]; 
+            } 
+        } catch (error) { 
+            console.error('Error retrieving account', conditions, error); 
+            return [error, null]; 
+        } 
+    },
     createUser: async (email, fullname, password, dateTime) => {
         try {
             // checking if the fullname is unique
-            const check = await usersModel.find({ fullname: fullname }).exec();
-            if (check.length == 0) {
+            const check_email = await usersModel.find({ email: email }).exec();
+            const check_fullname = await usersModel.find({ fullname: fullname }).exec();
+            if (check_email.length == 0 && check_fullname.length == 0) {
                 const doc = { email, fullname, password, dateTime };
                 let user = new usersModel(doc);
 
@@ -94,8 +110,8 @@ module.exports = {
                 user = await user.save();
                 return [undefined, user];   
             } else {
-                console.error('Error creating account as fullname is taken');
-                error = 'Fullname is taken';
+                console.error('Error creating account as email and/or fullname is taken');
+                error = 'Email and/or fullname is taken';
                 return [error, null];
             }
         } catch (error) {
