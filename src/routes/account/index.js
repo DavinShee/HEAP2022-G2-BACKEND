@@ -2,16 +2,16 @@ const { Router } = require('express');
 const express = require('express');
 const { type } = require('express/lib/response');
 const moment = require('moment');
-const { findUser, createUser } = require('../../utils/index');
+const { findUser, createUser, findAndUpdateUser } = require('../../utils/index');
 const bcrypt = require("bcrypt");
  
 const router = express.Router();
  
 // finding user, logging user in
-router.get('/signin', async (req, res) => {
+router.post('/signin', async (req, res) => {
     try {
-        const email = req.query['email'];
-        const password = req.query['password'];
+        const email = req.body.email;
+        const password = req.body.password;
  
         const conditions = {};
         if (email) conditions.email = email;
@@ -19,7 +19,7 @@ router.get('/signin', async (req, res) => {
         const [findUserError, user] = await findUser(conditions);
  
         if (findUserError) {
-            throw new Error('Error retrieving account', conditions);
+            throw new Error('Error retrieving account as user does not exist or wrong password', conditions);
         }
         const response = {
             status: 200,
@@ -68,6 +68,45 @@ router.post('/signup', async (req, res) => {  // note that the frontend has to r
     } catch (error) {
         console.error('Error creating account', error);
         res.json(`Error creating account: ${error}`);
+    }
+});
+// update user info
+router.patch('/:email/:fullname', async (req, res) => {  // figure out what the first parameter is about
+    try {
+        if (
+            !req.params.email &&
+            !req.params.fullname 
+        ) {
+            throw new Error('Missing parameters');
+        }
+        const password = req.body.password;
+        const newPassword = req.body.newPassword;  // naming convention matters -> need see what the front end called it
+        if (password && newPassword){
+            const update = {};
+            const conditions = {
+                email: req.params.email,
+                fullname: req.params.fullname,
+                // password: req.params.password  (this should be removed as you cant use a plain text password to match a hashed password that is stored in database)
+            };
+            const salt = await bcrypt.genSalt(10);
+            update.password = await bcrypt.hash(newPassword, salt); // need to hash this when storing it in the database
+
+            const [error, user] = await findAndUpdateUser(conditions, password, update);  // the password is the original plain text password. To be compared with database password for authentication before changing password
+            if (error) {
+                throw new Error('Error updating user\'s account password', conditions);
+            }
+            const response = {
+                status: 200,
+                timestamp: moment().format(),
+                data: {
+                    user
+                }
+            };
+            res.json(response);
+        }
+    } catch (error) {
+        console.error('Error getting account', error);
+        res.json('Error getting account');
     }
 });
 module.exports = router;

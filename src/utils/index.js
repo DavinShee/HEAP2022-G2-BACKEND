@@ -68,7 +68,6 @@ module.exports = {
     // logging the user in
     findUser: async (conditions) => { 
         try { 
-            console.log(conditions)  // tbc: conditions is an object with the properties email 
             const query = usersModel.findOne({ email: conditions.email }); 
             query.sort({ createdAt: -1 }); 
  
@@ -118,20 +117,37 @@ module.exports = {
             console.error('Error creating account', error);
             return [error, null];
         }
-    }
-    // findAndUpdateUser: async (conditions, update) => {
-    //     try {
-    //         let doc = await usersModel
-    //             .findOneAndUpdate(conditions, update, {
-    //                 new: true
-    //             })
-    //             .exec();
-    //         return [undefined, doc];
-    //     } catch (error) {
-    //         console.error('Error updating note', error);
-    //         return [error, null];
-    //     }
-    // },
+    },
+    findAndUpdateUser: async (conditions, password, update) => {
+        try {
+            // get the user from the database and use bcrypt.compare to compare the password and only if it matches then continue the code below
+            const query = usersModel.findOne({ email: conditions.email }); 
+            query.sort({ createdAt: -1 });
+            const user = await query.exec(); 
+            if (user) { 
+                const validPassword = await bcrypt.compare(password, user.password); 
+                if (validPassword) {
+                    let doc = await usersModel
+                        .findOneAndUpdate(conditions, update, {  // conditons only have email and fullname. update needs to have the newPassword as hashed, store in database as hashed
+                            new: true
+                        })
+                        .exec();
+                    return [undefined, doc];
+                } else {
+                    console.error('Error retrieving account', conditions); 
+                    error = "Invalid Password"; 
+                    return [error, null]; 
+                }
+            } else {
+                console.error('Error retrieving account', conditions); 
+                error = "User does not exist"; 
+                return [error, null];
+            }
+        } catch (error) {
+            console.error('Error updating user', error);
+            return [error, null];
+        }
+    },
     // findAndDeleteUser: async (conditions) => {
     //     try {
     //         let doc = await notesModel.findOneAndDelete(conditions).exec();
