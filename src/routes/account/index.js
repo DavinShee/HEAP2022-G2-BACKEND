@@ -2,7 +2,7 @@ const { Router } = require('express');
 const express = require('express');
 const { type } = require('express/lib/response');
 const moment = require('moment');
-const { findUser, createUser, findAndUpdateUser } = require('../../utils/index');
+const { findUser, createUser, findAndUpdateUser, findAndDeleteUser } = require('../../utils/index');
 const bcrypt = require("bcrypt");
  
 const router = express.Router();
@@ -104,6 +104,40 @@ router.patch('/:email/:fullname', async (req, res) => {  // figure out what the 
             };
             res.json(response);
         }
+    } catch (error) {
+        console.error('Error getting account', error);
+        res.json('Error getting account');
+    }
+});
+// deleting user account
+router.delete('/:email/:fullname', async (req, res) => {
+    try {
+        if (
+            !req.params.email &&
+            !req.params.fullname 
+        ) {
+            throw new Error('Missing parameters');
+        }
+
+        // to add in: need to check if the user is logged in before proceeding to delete the account
+
+        const conditions = {
+            email: req.params.email,
+            fullname: req.params.fullname,
+        };
+
+        const [error, user] = await findAndDeleteUser(conditions);
+        if (error) {
+            throw new Error('Error deleting account', conditions);
+        }
+        const response = {
+            status: 200,
+            timestamp: moment().format(),
+            data: {
+                user
+            }
+        };
+        res.json(response);
     } catch (error) {
         console.error('Error getting account', error);
         res.json('Error getting account');

@@ -148,13 +148,18 @@ module.exports = {
             return [error, null];
         }
     },
-    // findAndDeleteUser: async (conditions) => {
-    //     try {
-    //         let doc = await notesModel.findOneAndDelete(conditions).exec();
-    //         return [undefined, doc];
-    //     } catch (error) {
-    //         console.error('Error deleting note', error);
-    //         return [error, null];
-    //     }
-    //},
+    findAndDeleteUser: async (conditions) => {
+        try {
+            let doc = await usersModel.findOneAndDelete(conditions).exec();
+            if (doc == null){
+                const error = "Error getting account";
+                console.error('Error deleting account', error);
+                return [error, null];
+            }
+            return [undefined, doc];
+        } catch (error) {
+            console.error('Error deleting account', error);
+            return [error, null];
+        }
+    }
 };
