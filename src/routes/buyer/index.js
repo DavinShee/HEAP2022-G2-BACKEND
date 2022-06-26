@@ -39,6 +39,42 @@ router.get('/', async (req, res) => {
         res.json('Error getting notes');
     }
 });
+
+// Get related notes of the same mod by note id
+router.get('/:id', async (req, res) => {
+    try {
+        if (!req.params.id) {
+            throw new Error('Missing note id');
+        }
+        const id = req.params.id;
+        // get modId of current note
+        let conditions = { _id: id };
+        const [findNoteError, note] = await findAllNotes(conditions);
+        if (findNoteError) {
+            throw new Error('Error retrieving similar notes', conditions);
+        }
+        const modId = note[0].modId;
+
+        // get all notes with the same modId
+        conditions = { modId, _id: { $ne: id } };
+        const [findAllNotesError, notes] = await findAllNotes(conditions);
+        if (findAllNotesError) {
+            throw new Error('Error retrieving similar notes', conditions);
+        }
+        const response = {
+            status: 200,
+            timestamp: moment().format(),
+            data: {
+                notes
+            }
+        };
+        res.json(response);
+    } catch (error) {
+        console.error('Error getting notes', error);
+        res.json('Error getting notes');
+    }
+});
+
 router.post('/', async (req, res) => {
     try {
         if (
