@@ -15,7 +15,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/routes', route);
 app.use(express.json());
 
-app.use(cors());
+app.use(cors({origin:false,methods: "GET,HEAD,PUT,PATCH,POST,DELETE"}));
 mongoose.connect('mongodb://localhost:27017/HEAP', {
     useNewUrlParser: true
 });
