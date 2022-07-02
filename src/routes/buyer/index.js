@@ -19,10 +19,11 @@ router.get('/', async (req, res) => {
 
         const conditions = {};
         if (modId) conditions.modId = modId;
-        if (profName) conditions.profName = profName;
-        if (authorName) conditions.authorName = authorName;
+        if (profName)
+            conditions.profName = { $regex: new RegExp(profName, 'i') };
+        if (authorName)
+            conditions.authorName = { $regex: new RegExp(authorName, 'i') };
         const [findAllNotesError, notes] = await findAllNotes(conditions);
-
         if (findAllNotesError) {
             throw new Error('Error retrieving all notes', conditions);
         }
