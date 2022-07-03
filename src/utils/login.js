@@ -80,37 +80,4 @@ module.exports = {
         }
     },
     loginSessionValidation
-    // // updating expiry after API call is made
-    // loginSessionRenewal: async (email) => {
-    //     try {
-    //         // checking if a session for the user exists 
-    //         const query = loginTrackerModel.findOne({ email: email });
-    //         const userExistSession = await query.exec(); 
-    //         if (userExistSession) {
-    //             var currentDateTime = new Date()
-    //             // checking if the expiry date has not yet been reached
-    //             if (userExistSession.expiryDateTime.getTime() > currentDateTime.getTime()){
-    //                 var expiryDateTime = new Date(currentDateTime.getTime() + 30*60000)
-    //                 let doc = await loginTrackerModel
-    //                     .findOneAndUpdate({email: email}, {expiryDateTime: expiryDateTime}, {
-    //                         new: true
-    //                     })
-    //                     .exec();
-    //                 return [undefined, doc];
-    //             }
-    //             else {
-    //                 console.error('Error updating user session', error);
-    //                 error = "Session expired"
-    //                 return [error, null];
-    //             }
-    //         } else {
-    //             console.error('Error updating user session', error);
-    //             error = "User was not signed in"
-    //             return [error, null];
-    //         }
-    //     } catch{
-    //         console.error('Error updating user session', error);
-    //         return [error, null];
-    //     }
-    // }
 };
