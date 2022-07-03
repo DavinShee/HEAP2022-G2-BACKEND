@@ -4,6 +4,7 @@ const { type } = require('express/lib/response');
 const moment = require('moment');
 const { findUser, createUser, findAndUpdateUser, findAndDeleteUser } = require('../../utils/index');
 const bcrypt = require("bcrypt");
+const { loginSessionStart, loginSessionRenewal } = require('../../utils/login')
  
 const router = express.Router();
  
@@ -21,11 +22,21 @@ router.post('/signin', async (req, res) => {
         if (findUserError) {
             throw new Error('Error retrieving account as user does not exist or wrong password', conditions);
         }
+
+        // creating and starting the tracking of user log in
+        const [createSessionError, userSession] = await loginSessionStart(
+            email,
+        );
+        if (createSessionError) {
+            throw createSessionError;
+        }
+
         const response = {
             status: 200,
             timestamp: moment().format(),
             data: {
-                user
+                user,
+                userSession
             }
         };
         res.json(response);
@@ -57,11 +68,21 @@ router.post('/signup', async (req, res) => {  // note that the frontend has to r
         if (createAccountError) {
             throw createAccountError;
         }
+
+        // creating and starting the tracking of user log in
+        const [createSessionError, userSession] = await loginSessionStart(
+            email,
+        );
+        if (createSessionError) {
+            throw createSessionError;
+        }
+
         const response = {
             status: 200,
             timestamp: moment().format(),
             data: {
-                user
+                user,
+                userSession
             }
         };
         res.json(response);
@@ -79,6 +100,15 @@ router.patch('/:email/:fullname', async (req, res) => {  // figure out what the 
         ) {
             throw new Error('Missing parameters');
         }
+
+        // updating user session 
+        const [createSessionError, userSession] = await loginSessionRenewal(
+            req.params.email,
+        );
+        if (createSessionError) {
+            throw createSessionError;
+        }
+        
         const password = req.body.password;
         const newPassword = req.body.newPassword;  // naming convention matters -> need see what the front end called it
         if (password && newPassword){
@@ -99,7 +129,8 @@ router.patch('/:email/:fullname', async (req, res) => {  // figure out what the 
                 status: 200,
                 timestamp: moment().format(),
                 data: {
-                    user
+                    user,
+                    userSession
                 }
             };
             res.json(response);
@@ -119,7 +150,7 @@ router.delete('/:email/:fullname', async (req, res) => {
             throw new Error('Missing parameters');
         }
 
-        // to add in: need to check if the user is logged in before proceeding to delete the account
+        // check if the user is signed in 
 
         const conditions = {
             email: req.params.email,
@@ -130,6 +161,9 @@ router.delete('/:email/:fullname', async (req, res) => {
         if (error) {
             throw new Error('Error deleting account', conditions);
         }
+
+        // delete user session 
+        
         const response = {
             status: 200,
             timestamp: moment().format(),
