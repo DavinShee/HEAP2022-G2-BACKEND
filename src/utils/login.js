@@ -78,7 +78,8 @@ module.exports = {
             console.error('Error updating user session', error);
             return [error, null];
         }
-    }
+    },
+    loginSessionValidation
     // // updating expiry after API call is made
     // loginSessionRenewal: async (email) => {
     //     try {
