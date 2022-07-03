@@ -92,34 +92,29 @@ router.post('/signup', async (req, res) => {  // note that the frontend has to r
     }
 });
 // update user info
-router.patch('/:email/:fullname', async (req, res) => {  // figure out what the first parameter is about
+router.patch('/edit', async (req, res) => {  // figure out what the first parameter is about
     try {
-        if (
-            !req.params.email &&
-            !req.params.fullname 
-        ) {
-            throw new Error('Missing parameters');
-        }
+        const email = req.body.email;
+        const fullname = req.body.fullname;
+        const password = req.body.password;
+        const newPassword = req.body.newPassword; 
 
         // updating user session 
         const [createSessionError, userSession] = await loginSessionRenewal(
-            req.params.email,
+            email,
         );
         if (createSessionError) {
             throw createSessionError;
         }
         
-        const password = req.body.password;
-        const newPassword = req.body.newPassword;  // naming convention matters -> need see what the front end called it
-        if (password && newPassword){
+        if (email && fullname && password && newPassword){
             const update = {};
             const conditions = {
-                email: req.params.email,
-                fullname: req.params.fullname,
-                // password: req.params.password  (this should be removed as you cant use a plain text password to match a hashed password that is stored in database)
+                email: email,
+                fullname: fullname,
             };
             const salt = await bcrypt.genSalt(10);
-            update.password = await bcrypt.hash(newPassword, salt); // need to hash this when storing it in the database
+            update.password = await bcrypt.hash(newPassword, salt); 
 
             const [error, user] = await findAndUpdateUser(conditions, password, update);  // the password is the original plain text password. To be compared with database password for authentication before changing password
             if (error) {
