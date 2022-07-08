@@ -18,6 +18,7 @@ module.exports = {
     },
     createNote: async (
         authorName,
+        comments,
         description,
         image,
         modId,
@@ -28,6 +29,7 @@ module.exports = {
         try {
             const doc = {
                 authorName,
+                comments,
                 description,
                 image,
                 modId,
@@ -66,37 +68,42 @@ module.exports = {
         }
     },
     // logging the user in
-    findUser: async (conditions) => { 
-        try { 
-            const query = usersModel.findOne({ email: conditions.email }); 
-            query.sort({ createdAt: -1 }); 
- 
-            const user = await query.exec(); 
-            if (user) { 
-                // check user password with hashed password stored in the database 
-                const validPassword = await bcrypt.compare(conditions.password, user.password); 
-                if (validPassword) { 
-                    return [undefined, user]; 
-                } else { 
-                    console.error('Error retrieving account', conditions); 
-                    error = "Invalid Password"; 
-                    return [error, null]; 
-                } 
-            } else { 
-                console.error('Error retrieving account', conditions); 
-                error = "User does not exist"; 
-                return [error, null]; 
-            } 
-        } catch (error) { 
-            console.error('Error retrieving account', conditions, error); 
-            return [error, null]; 
-        } 
+    findUser: async (conditions) => {
+        try {
+            const query = usersModel.findOne({ email: conditions.email });
+            query.sort({ createdAt: -1 });
+
+            const user = await query.exec();
+            if (user) {
+                // check user password with hashed password stored in the database
+                const validPassword = await bcrypt.compare(
+                    conditions.password,
+                    user.password
+                );
+                if (validPassword) {
+                    return [undefined, user];
+                } else {
+                    console.error('Error retrieving account', conditions);
+                    error = 'Invalid Password';
+                    return [error, null];
+                }
+            } else {
+                console.error('Error retrieving account', conditions);
+                error = 'User does not exist';
+                return [error, null];
+            }
+        } catch (error) {
+            console.error('Error retrieving account', conditions, error);
+            return [error, null];
+        }
     },
     createUser: async (email, fullname, password, dateTime) => {
         try {
             // checking if the fullname is unique
             const check_email = await usersModel.find({ email: email }).exec();
-            const check_fullname = await usersModel.find({ fullname: fullname }).exec();
+            const check_fullname = await usersModel
+                .find({ fullname: fullname })
+                .exec();
             if (check_email.length == 0 && check_fullname.length == 0) {
                 const doc = { email, fullname, password, dateTime };
                 let user = new usersModel(doc);
@@ -107,9 +114,11 @@ module.exports = {
                 user.password = await bcrypt.hash(user.password, salt);
 
                 user = await user.save();
-                return [undefined, user];   
+                return [undefined, user];
             } else {
-                console.error('Error creating account as email and/or fullname is taken');
+                console.error(
+                    'Error creating account as email and/or fullname is taken'
+                );
                 error = 'Email and/or fullname is taken';
                 return [error, null];
             }
@@ -121,26 +130,30 @@ module.exports = {
     findAndUpdateUser: async (conditions, password, update) => {
         try {
             // get the user from the database and use bcrypt.compare to compare the password and only if it matches then continue the code below
-            const query = usersModel.findOne({ email: conditions.email }); 
+            const query = usersModel.findOne({ email: conditions.email });
             query.sort({ createdAt: -1 });
-            const user = await query.exec(); 
-            if (user) { 
-                const validPassword = await bcrypt.compare(password, user.password); 
+            const user = await query.exec();
+            if (user) {
+                const validPassword = await bcrypt.compare(
+                    password,
+                    user.password
+                );
                 if (validPassword) {
                     let doc = await usersModel
-                        .findOneAndUpdate(conditions, update, {  // conditons only have email and fullname. update needs to have the newPassword as hashed, store in database as hashed
+                        .findOneAndUpdate(conditions, update, {
+                            // conditons only have email and fullname. update needs to have the newPassword as hashed, store in database as hashed
                             new: true
                         })
                         .exec();
                     return [undefined, doc];
                 } else {
-                    console.error('Error retrieving account', conditions); 
-                    error = "Invalid Password"; 
-                    return [error, null]; 
+                    console.error('Error retrieving account', conditions);
+                    error = 'Invalid Password';
+                    return [error, null];
                 }
             } else {
-                console.error('Error retrieving account', conditions); 
-                error = "User does not exist"; 
+                console.error('Error retrieving account', conditions);
+                error = 'User does not exist';
                 return [error, null];
             }
         } catch (error) {
@@ -151,8 +164,8 @@ module.exports = {
     findAndDeleteUser: async (conditions) => {
         try {
             let doc = await usersModel.findOneAndDelete(conditions).exec();
-            if (doc == null){
-                const error = "Error getting account";
+            if (doc == null) {
+                const error = 'Error getting account';
                 console.error('Error deleting account', error);
                 return [error, null];
             }

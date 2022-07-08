@@ -1,6 +1,7 @@
 const express = require('express');
 const { type } = require('express/lib/response');
 const moment = require('moment');
+const { addComments } = require('../../utils/comment');
 const {
     findAllNotes,
     createNote,
@@ -9,6 +10,7 @@ const {
 } = require('../../utils/index');
 
 const router = express.Router();
+
 router.get('/', async (req, res) => {
     try {
         const modId = req.query['mod-id'];
@@ -76,6 +78,7 @@ router.get('/:id', async (req, res) => {
     }
 });
 
+// create note
 router.post('/', async (req, res) => {
     try {
         if (
@@ -96,9 +99,11 @@ router.post('/', async (req, res) => {
         const price = req.body.price;
         const profName = req.body.profName;
         const year = req.body.year;
+        const comments = [];
 
         const [createNoteError, note] = await createNote(
             authorName,
+            comments,
             description,
             image,
             modId,
@@ -171,6 +176,28 @@ router.patch('/:modId/:profName/:authorName', async (req, res) => {
         console.error('Error getting notes', error);
         res.json('Error getting notes');
     }
+});
+// add comments to note
+router.patch('/:id', async (req, res) => {
+    try {
+        if (!req.params.id) {
+            throw new Error('Missing note id');
+        }
+        const id = req.params.id;
+        const comment = req.body.comment;
+        const [error, note] = await addComments(id, comment);
+        if (error) {
+            throw new Error('Error adding comment', error);
+        }
+        const response = {
+            status: 200,
+            timestamp: moment().format(),
+            data: {
+                note
+            }
+        };
+        res.json(response);
+    } catch (error) {}
 });
 
 router.delete('/:modId/:profName/:authorName', async (req, res) => {

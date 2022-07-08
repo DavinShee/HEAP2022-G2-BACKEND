@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const noteSchema = new mongoose.Schema(
     {
         authorName: { type: String, required: true },
+        comments: [{ type: String, required: true }],
         description: { type: String, required: false },
         image: [{ type: String, required: true }],
         modId: { type: String, required: true },
