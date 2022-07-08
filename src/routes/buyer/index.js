@@ -1,5 +1,4 @@
 const express = require('express');
-const { type } = require('express/lib/response');
 const moment = require('moment');
 const { addComments } = require('../../utils/comment');
 const {
@@ -128,16 +127,14 @@ router.post('/', async (req, res) => {
     }
 });
 
-router.patch('/:modId/:profName/:authorName', async (req, res) => {
+router.patch('/:id', async (req, res) => {
     try {
-        if (
-            !req.params.modId &&
-            !req.params.profName &&
-            !req.params.authorName
-        ) {
-            throw new Error('Missing parameters');
+        if (!req.params.id) {
+            throw new Error('Missing id as parameter');
         }
+        const id = req.params.id;
         const authorName = req.body.authorName || undefined;
+        const comment = req.body.comment || undefined;
         const description = req.body.description || undefined;
         const image = req.body.image || undefined;
         const modId = req.body.modId || undefined;
@@ -147,10 +144,14 @@ router.patch('/:modId/:profName/:authorName', async (req, res) => {
 
         const update = {};
         const conditions = {
-            modId: req.params.modId,
-            profName: req.params.profName,
-            authorName: req.params.authorName
+            _id: id
         };
+
+        // adding comments
+        if (comment) {
+            const [error, note] = await addComments(id, comment);
+            if (error) throw new Error('Error adding comment', error);
+        }
 
         if (authorName) update.authorName = authorName;
         if (description) update.description = description;
@@ -159,7 +160,6 @@ router.patch('/:modId/:profName/:authorName', async (req, res) => {
         if (price) update.price = price;
         if (profName) update.profName = profName;
         if (year) update.year = year;
-
         const [error, note] = await findAndUpdateNote(conditions, update);
         if (error) {
             throw new Error('Error updating all notes', conditions);
@@ -177,43 +177,15 @@ router.patch('/:modId/:profName/:authorName', async (req, res) => {
         res.json('Error getting notes');
     }
 });
-// add comments to note
-router.patch('/:id', async (req, res) => {
+
+router.delete('/:id', async (req, res) => {
     try {
         if (!req.params.id) {
-            throw new Error('Missing note id');
-        }
-        const id = req.params.id;
-        const comment = req.body.comment;
-        const [error, note] = await addComments(id, comment);
-        if (error) {
-            throw new Error('Error adding comment', error);
-        }
-        const response = {
-            status: 200,
-            timestamp: moment().format(),
-            data: {
-                note
-            }
-        };
-        res.json(response);
-    } catch (error) {}
-});
-
-router.delete('/:modId/:profName/:authorName', async (req, res) => {
-    try {
-        if (
-            !req.params.modId &&
-            !req.params.profName &&
-            !req.params.authorName
-        ) {
             throw new Error('Missing parameters');
         }
 
         const conditions = {
-            modId: req.params.modId,
-            profName: req.params.profName,
-            authorName: req.params.authorName
+            _id: req.params.id
         };
 
         const [error, note] = await findAndDeleteNote(conditions);
