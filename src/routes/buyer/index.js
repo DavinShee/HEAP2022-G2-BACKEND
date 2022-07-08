@@ -1,6 +1,4 @@
-const { Router } = require('express');
 const express = require('express');
-const res = require('express/lib/response');
 const { type } = require('express/lib/response');
 const moment = require('moment');
 const {
@@ -48,12 +46,13 @@ router.get('/:id', async (req, res) => {
             throw new Error('Missing note id');
         }
         const id = req.params.id;
-        // get modId of current note
+        // get current note
         let conditions = { _id: id };
         const [findNoteError, note] = await findAllNotes(conditions);
         if (findNoteError) {
             throw new Error('Error retrieving similar notes', conditions);
         }
+
         const modId = note[0].modId;
 
         // get all notes with the same modId
@@ -66,7 +65,8 @@ router.get('/:id', async (req, res) => {
             status: 200,
             timestamp: moment().format(),
             data: {
-                notes
+                note: note[0],
+                relatedNotes: notes
             }
         };
         res.json(response);
