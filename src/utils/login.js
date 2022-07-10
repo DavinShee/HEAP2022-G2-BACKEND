@@ -92,5 +92,20 @@ module.exports = {
             return [error, null];
         }
     },
-    loginSessionValidation
+    loginSessionValidation,
+    // deleting user session
+    deletingSession: async (conditions) => {
+        try {
+            let doc = await loginTrackerModel.findOneAndDelete(conditions).exec();
+            if (doc) {
+                return [undefined, doc];
+            }
+            const error = 'Error deleting session';
+            console.error('Error deleting session', error);
+            return [error, null];
+        } catch (error) {
+            console.error('Error deleting session', error);
+            return [error, null];
+        }
+    }
 };
