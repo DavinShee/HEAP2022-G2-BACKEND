@@ -5,7 +5,7 @@ const { type } = require('express/lib/response');
 const moment = require('moment');
 const { findUser, createUser, findAndUpdateUser, findAndDeleteUser } = require('../../utils/index');
 const bcrypt = require("bcrypt");
-const { loginSessionStart, loginSessionRenewal } = require('../../utils/login')
+const { loginSessionStart, loginSessionRenewal, loginSessionValidation } = require('../../utils/login')
  
 const router = express.Router();
  
@@ -54,7 +54,7 @@ router.post('/signup', async (req, res) => {  // note that the frontend has to r
         }
         const email = req.body.email;
         const password = req.body.password;
-        const fullname = req.body.fullname;
+        const fullname = req.body.fullname.trim();
         var today = new Date();
         var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
         var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
@@ -93,7 +93,7 @@ router.post('/signup', async (req, res) => {  // note that the frontend has to r
     }
 });
 // update user info
-router.patch('/edit', async (req, res) => {  // figure out what the first parameter is about
+router.patch('/edit', async (req, res) => {  
     try {
         const email = req.body.email;
         const fullname = req.body.fullname;
@@ -137,20 +137,16 @@ router.patch('/edit', async (req, res) => {  // figure out what the first parame
     }
 });
 // deleting user account
-router.delete('/:email/:fullname', async (req, res) => {
+router.delete('/:email', async (req, res) => {
     try {
         if (
-            !req.params.email &&
-            !req.params.fullname 
+            !req.params.email
         ) {
             throw new Error('Missing parameters');
         }
 
-        // check if the user is signed in 
-
         const conditions = {
             email: req.params.email,
-            fullname: req.params.fullname,
         };
 
         const [error, user] = await findAndDeleteUser(conditions);
@@ -158,7 +154,7 @@ router.delete('/:email/:fullname', async (req, res) => {
             throw new Error('Error deleting account', conditions);
         }
 
-        // delete user session 
+        // TO DO: delete user session 
         
         const response = {
             status: 200,
@@ -171,6 +167,60 @@ router.delete('/:email/:fullname', async (req, res) => {
     } catch (error) {
         console.error('Error getting account', error);
         res.json('Error getting account');
+    }
+});
+// checking if the user is logged in
+router.get('/:email', async (req, res) => {
+    try {
+        if (
+            !req.params.email
+        ) {
+            throw new Error('Missing parameters');
+        }
+
+        const [error, userSession] = await loginSessionValidation(req.params.email);
+        if (error) {
+            throw new Error('Error checking user session', conditions);
+        }
+
+        const response = {
+            status: 200,
+            timestamp: moment().format(),
+            data: {
+                userSession
+            }
+        };
+        res.json(response);
+    } catch (error) {
+        console.error('Error checking user session', error);
+        res.status(500).json('Error checking user session');
+    }
+});
+// extending user session
+router.patch('/:email', async (req, res) => {
+    try {
+        if (
+            !req.params.email
+        ) {
+            throw new Error('Missing parameters');
+        }
+
+        const [error, userSession] = await loginSessionRenewal(req.params.email);
+        if (error) {
+            throw new Error('Error renewing user session', conditions);
+        }
+
+        const response = {
+            status: 200,
+            timestamp: moment().format(),
+            data: {
+                userSession
+            }
+        };
+        res.json(response);
+    } catch (error) {
+        console.error('Error renewing user session', error);
+        res.status(500).json('Error renewing user session');
     }
 });
 module.exports = router;
