@@ -3,30 +3,42 @@ const express = require('express');
 const res = require('express/lib/response');
 const { type } = require('express/lib/response');
 const moment = require('moment');
-const { findUser, createUser, findAndUpdateUser, findAndDeleteUser } = require('../../utils/index');
-const bcrypt = require("bcrypt");
-const { loginSessionStart, loginSessionRenewal, loginSessionValidation } = require('../../utils/login')
- 
+const {
+    findUser,
+    createUser,
+    findAndUpdateUser,
+    findAndDeleteUser
+} = require('../../utils/index');
+const bcrypt = require('bcrypt');
+const {
+    loginSessionStart,
+    loginSessionRenewal,
+    loginSessionValidation
+} = require('../../utils/login');
+
 const router = express.Router();
- 
+
 // finding user, logging user in
 router.post('/signin', async (req, res) => {
     try {
         const email = req.body.email;
         const password = req.body.password;
- 
+
         const conditions = {};
         if (email) conditions.email = email;
         if (password) conditions.password = password;
         const [findUserError, user] = await findUser(conditions);
- 
+
         if (findUserError) {
-            throw new Error('Error retrieving account as user does not exist or wrong password', conditions);
+            throw new Error(
+                'Error retrieving account as user does not exist or wrong password',
+                conditions
+            );
         }
 
         // creating and starting the tracking of user log in
         const [createSessionError, userSession] = await loginSessionStart(
-            email,
+            email
         );
         if (createSessionError) {
             throw createSessionError;
@@ -43,11 +55,12 @@ router.post('/signin', async (req, res) => {
         res.json(response);
     } catch (error) {
         console.error('Error retrieving account', error);
-        res.json('Error retrieving account');
+        res.status(500).json('Error retrieving account ' + error);
     }
 });
 // signing up the user (creating account)
-router.post('/signup', async (req, res) => {  // note that the frontend has to route to signup
+router.post('/signup', async (req, res) => {
+    // note that the frontend has to route to signup
     try {
         if (!req.body.email || !req.body.fullname || !req.body.password) {
             throw new Error('Missing parameters');
@@ -56,9 +69,19 @@ router.post('/signup', async (req, res) => {  // note that the frontend has to r
         const password = req.body.password;
         const fullname = req.body.fullname.trim();
         var today = new Date();
-        var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
-        var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-        var dateTime = date+' '+time;
+        var date =
+            today.getFullYear() +
+            '-' +
+            (today.getMonth() + 1) +
+            '-' +
+            today.getDate();
+        var time =
+            today.getHours() +
+            ':' +
+            today.getMinutes() +
+            ':' +
+            today.getSeconds();
+        var dateTime = date + ' ' + time;
 
         const [createAccountError, user] = await createUser(
             email,
@@ -72,7 +95,7 @@ router.post('/signup', async (req, res) => {  // note that the frontend has to r
 
         // creating and starting the tracking of user log in
         const [createSessionError, userSession] = await loginSessionStart(
-            email,
+            email
         );
         if (createSessionError) {
             throw createSessionError;
@@ -89,37 +112,44 @@ router.post('/signup', async (req, res) => {  // note that the frontend has to r
         res.json(response);
     } catch (error) {
         console.error('Error creating account', error);
-        res.json(`Error creating account: ${error}`);
+        res.status(500).json(`Error creating account: ${error}`);
     }
 });
 // update user info
-router.patch('/edit', async (req, res) => {  
+router.patch('/edit', async (req, res) => {
     try {
         const email = req.body.email;
         const fullname = req.body.fullname;
         const password = req.body.password;
-        const newPassword = req.body.newPassword; 
+        const newPassword = req.body.newPassword;
 
-        // updating user session 
+        // updating user session
         const [createSessionError, userSession] = await loginSessionRenewal(
-            email,
+            email
         );
         if (createSessionError) {
             throw createSessionError;
         }
-        
-        if (email && fullname && password && newPassword){
+
+        if (email && fullname && password && newPassword) {
             const update = {};
             const conditions = {
                 email: email,
-                fullname: fullname,
+                fullname: fullname
             };
             const salt = await bcrypt.genSalt(10);
-            update.password = await bcrypt.hash(newPassword, salt); 
+            update.password = await bcrypt.hash(newPassword, salt);
 
-            const [error, user] = await findAndUpdateUser(conditions, password, update);  // the password is the original plain text password. To be compared with database password for authentication before changing password
+            const [error, user] = await findAndUpdateUser(
+                conditions,
+                password,
+                update
+            ); // the password is the original plain text password. To be compared with database password for authentication before changing password
             if (error) {
-                throw new Error('Error updating user\'s account password', conditions);
+                throw new Error(
+                    "Error updating user's account password",
+                    conditions
+                );
             }
             const response = {
                 status: 200,
@@ -133,20 +163,18 @@ router.patch('/edit', async (req, res) => {
         }
     } catch (error) {
         console.error('Error getting account', error);
-        res.json('Error getting account');
+        res.status(500).json('Error getting account ' + error);
     }
 });
 // deleting user account
 router.delete('/:email', async (req, res) => {
     try {
-        if (
-            !req.params.email
-        ) {
+        if (!req.params.email) {
             throw new Error('Missing parameters');
         }
 
         const conditions = {
-            email: req.params.email,
+            email: req.params.email
         };
 
         const [error, user] = await findAndDeleteUser(conditions);
@@ -154,8 +182,8 @@ router.delete('/:email', async (req, res) => {
             throw new Error('Error deleting account', conditions);
         }
 
-        // TO DO: delete user session 
-        
+        // TO DO: delete user session
+
         const response = {
             status: 200,
             timestamp: moment().format(),
@@ -166,19 +194,19 @@ router.delete('/:email', async (req, res) => {
         res.json(response);
     } catch (error) {
         console.error('Error getting account', error);
-        res.json('Error getting account');
+        res.status(500).json('Error getting account ' + error);
     }
 });
 // checking if the user is logged in
 router.get('/:email', async (req, res) => {
     try {
-        if (
-            !req.params.email
-        ) {
+        if (!req.params.email) {
             throw new Error('Missing parameters');
         }
 
-        const [error, userSession] = await loginSessionValidation(req.params.email);
+        const [error, userSession] = await loginSessionValidation(
+            req.params.email
+        );
         if (error) {
             throw new Error('Error checking user session', conditions);
         }
@@ -193,19 +221,19 @@ router.get('/:email', async (req, res) => {
         res.json(response);
     } catch (error) {
         console.error('Error checking user session', error);
-        res.status(500).json('Error checking user session');
+        res.status(500).json('Error checking user session ' + error);
     }
 });
 // extending user session
 router.patch('/:email', async (req, res) => {
     try {
-        if (
-            !req.params.email
-        ) {
+        if (!req.params.email) {
             throw new Error('Missing parameters');
         }
 
-        const [error, userSession] = await loginSessionRenewal(req.params.email);
+        const [error, userSession] = await loginSessionRenewal(
+            req.params.email
+        );
         if (error) {
             throw new Error('Error renewing user session', conditions);
         }
@@ -220,7 +248,7 @@ router.patch('/:email', async (req, res) => {
         res.json(response);
     } catch (error) {
         console.error('Error renewing user session', error);
-        res.status(500).json('Error renewing user session');
+        res.status(500).json('Error renewing user session ' + error);
     }
 });
 module.exports = router;

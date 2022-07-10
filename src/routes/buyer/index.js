@@ -44,7 +44,7 @@ router.get('/', async (req, res) => {
         res.json(response);
     } catch (error) {
         console.error('Error getting notes', error);
-        res.json('Error getting notes');
+        res.status(500).json('Error getting notes ' + error);
     }
 });
 
@@ -81,7 +81,7 @@ router.get('/:id', async (req, res) => {
         res.json(response);
     } catch (error) {
         console.error('Error getting notes', error);
-        res.json('Error getting notes');
+        res.status(500).json('Error getting notes ' + error);
     }
 });
 
@@ -134,7 +134,7 @@ router.post('/', async (req, res) => {
         res.json(response);
     } catch (error) {
         console.error('Error creating note', error);
-        res.json(`Error creating note: ${error}`);
+        res.status(500).json(`Error creating note: ${error}`);
     }
 });
 
@@ -185,7 +185,7 @@ router.patch('/:id', async (req, res) => {
         res.json(response);
     } catch (error) {
         console.error('Error getting notes', error);
-        res.json('Error getting notes');
+        res.status(500).json('Error getting notes ' + error);
     }
 });
 
@@ -213,7 +213,7 @@ router.delete('/:id', async (req, res) => {
         res.json(response);
     } catch (error) {
         console.error('Error getting notes', error);
-        res.json('Error getting notes');
+        res.status(500).json('Error getting notes ' + error);
     }
 });
 

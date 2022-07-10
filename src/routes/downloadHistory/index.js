@@ -38,7 +38,7 @@ router.get('/:email', async (req, res) => {
         res.json(response);
     } catch (error) {
         console.error('Error getting downloadHistory', error);
-        res.status(500).json('Error getting downloadHistory');
+        res.status(500).json('Error getting downloadHistory ' + error);
     }
 });
 
@@ -64,7 +64,7 @@ router.post('/', async (req, res) => {
         res.json(response);
     } catch (error) {
         console.error('Error creating downloadHistory', error);
-        res.status(500).json('Error creating downloadHistory');
+        res.status(500).json('Error creating downloadHistory ' + error);
     }
 });
 
