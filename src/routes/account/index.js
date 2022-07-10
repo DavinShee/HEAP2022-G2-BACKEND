@@ -13,7 +13,8 @@ const bcrypt = require('bcrypt');
 const {
     loginSessionStart,
     loginSessionRenewal,
-    loginSessionValidation
+    loginSessionValidation,
+    deletingSession
 } = require('../../utils/login');
 
 const router = express.Router();
@@ -173,16 +174,16 @@ router.delete('/:email', async (req, res) => {
             throw new Error('Missing parameters');
         }
 
-        const conditions = {
-            email: req.params.email
-        };
-
-        const [error, user] = await findAndDeleteUser(conditions);
+        const [error, user] = await findAndDeleteUser({ email: req.params.email });
         if (error) {
-            throw new Error('Error deleting account', conditions);
+            throw new Error('Error deleting account', req.params.email);
         }
 
-        // TO DO: delete user session
+        // deleting user session
+        const [sessionError, userSession] = await deletingSession({ email: req.params.email });
+        if (sessionError) {
+            throw new Error('Error deleting account', req.params.email);
+        }
 
         const response = {
             status: 200,
@@ -193,8 +194,8 @@ router.delete('/:email', async (req, res) => {
         };
         res.json(response);
     } catch (error) {
-        console.error('Error getting account', error);
-        res.status(500).json('Error getting account ' + error);
+        console.error('Error deleting account', error);
+        res.status(500).json('Error deleting account ' + error);
     }
 });
 // checking if the user is logged in
@@ -208,7 +209,7 @@ router.get('/:email', async (req, res) => {
             req.params.email
         );
         if (error) {
-            throw new Error('Error checking user session', conditions);
+            throw new Error('Error checking user session', req.params.email);
         }
 
         const response = {
@@ -235,7 +236,7 @@ router.patch('/:email', async (req, res) => {
             req.params.email
         );
         if (error) {
-            throw new Error('Error renewing user session', conditions);
+            throw new Error('Error renewing user session', req.params.email);
         }
 
         const response = {
