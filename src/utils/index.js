@@ -1,4 +1,3 @@
-const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const notesModel = require('../models/notes');
 const usersModel = require('../models/user');
