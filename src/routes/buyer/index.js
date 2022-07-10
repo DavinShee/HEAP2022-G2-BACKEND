@@ -92,12 +92,14 @@ router.post('/', async (req, res) => {
             !req.body.year ||
             !req.body.price ||
             !req.body.description ||
-            !req.body.image
+            !req.body.image ||
+            !req.body.email
         ) {
             throw new Error('Missing parameters');
         }
         const authorName = req.body.authorName;
         const description = req.body.description;
+        const email = req.body.email;
         const image = req.body.image;
         const modId = req.body.modId;
         const price = req.body.price;
@@ -109,6 +111,7 @@ router.post('/', async (req, res) => {
             authorName,
             comments,
             description,
+            email,
             image,
             modId,
             price,
