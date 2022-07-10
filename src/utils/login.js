@@ -11,14 +11,14 @@ async function loginSessionValidation (email) {
             var currentDateTime = new Date()
             // checking if the expiry date has not yet been reached
             if (userExistSession.expiryDateTime.getTime() > currentDateTime.getTime()){
-                return true;
+                return [undefined, userExistSession];
             }
-            return false;
+            return [error, null];
         }
-        return false;
+        return [error, null];
     } catch {
         console.error('Error validating user session', error);
-        return false;
+        return [error, null];
     }
 }
 
