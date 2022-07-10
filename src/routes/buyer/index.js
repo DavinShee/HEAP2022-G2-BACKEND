@@ -15,6 +15,7 @@ router.get('/', async (req, res) => {
         const modId = req.query['mod-id'];
         const profName = req.query['prof-name'];
         const authorName = req.query['author-name'];
+        const email = req.query['email'];
         const pageSize = Number(req.query['page-size']);
         const pageNum = Number(req.query['page-num']);
 
@@ -24,6 +25,8 @@ router.get('/', async (req, res) => {
             conditions.profName = { $regex: new RegExp(profName, 'i') };
         if (authorName)
             conditions.authorName = { $regex: new RegExp(authorName, 'i') };
+        if (email) conditions.email = email;
+
         const [findAllNotesError, notes, numberOfNotes, hasNext] =
             await findAllNotes(conditions, pageNum, pageSize);
         if (findAllNotesError) {
