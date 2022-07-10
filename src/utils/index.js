@@ -111,10 +111,7 @@ module.exports = {
         try {
             // checking if the fullname is unique
             const check_email = await usersModel.find({ email: email }).exec();
-            const check_fullname = await usersModel
-                .find({ fullname: fullname })
-                .exec();
-            if (check_email.length == 0 && check_fullname.length == 0) {
+            if (check_email.length == 0) {
                 const doc = { email, fullname, password, dateTime };
                 let user = new usersModel(doc);
 
@@ -127,9 +124,9 @@ module.exports = {
                 return [undefined, user];
             } else {
                 console.error(
-                    'Error creating account as email and/or fullname is taken'
+                    'Error creating account as email is taken'
                 );
-                error = 'Email and/or fullname is taken';
+                error = 'Email is taken';
                 return [error, null];
             }
         } catch (error) {
