@@ -199,32 +199,32 @@ router.delete('/:email', async (req, res) => {
     }
 });
 // checking if the user is logged in
-router.get('/:email', async (req, res) => {
-    try {
-        if (!req.params.email) {
-            throw new Error('Missing parameters');
-        }
+// router.get('/:email', async (req, res) => {
+//     try {
+//         if (!req.params.email) {
+//             throw new Error('Missing parameters');
+//         }
 
-        const [error, userSession] = await loginSessionValidation(
-            req.params.email
-        );
-        if (error) {
-            throw new Error('Error checking user session', req.params.email);
-        }
+//         const [error, userSession] = await loginSessionValidation(
+//             req.params.email
+//         );
+//         if (error) {
+//             throw new Error('Error checking user session', req.params.email);
+//         }
 
-        const response = {
-            status: 200,
-            timestamp: moment().format(),
-            data: {
-                userSession
-            }
-        };
-        res.json(response);
-    } catch (error) {
-        console.error('Error checking user session', error);
-        res.status(500).json('Error checking user session ' + error);
-    }
-});
+//         const response = {
+//             status: 200,
+//             timestamp: moment().format(),
+//             data: {
+//                 userSession
+//             }
+//         };
+//         res.json(response);
+//     } catch (error) {
+//         console.error('Error checking user session', error);
+//         res.status(500).json('Error checking user session ' + error);
+//     }
+// });
 // extending user session
 router.patch('/:email', async (req, res) => {
     try {
@@ -232,10 +232,19 @@ router.patch('/:email', async (req, res) => {
             throw new Error('Missing parameters');
         }
 
-        const [error, userSession] = await loginSessionRenewal(
+        // checking if session is valid
+        const [checkingError, checkingUserSession] = await loginSessionValidation(
             req.params.email
         );
-        if (error) {
+        if (checkingError) {
+            throw new Error('Error checking user session', req.params.email);
+        }
+
+        // updating the session
+        const [updateError, updatingUserSession] = await loginSessionRenewal(
+            req.params.email
+        );
+        if (updateError) {
             throw new Error('Error renewing user session', req.params.email);
         }
 
@@ -243,13 +252,13 @@ router.patch('/:email', async (req, res) => {
             status: 200,
             timestamp: moment().format(),
             data: {
-                userSession
+                updatingUserSession
             }
         };
         res.json(response);
     } catch (error) {
-        console.error('Error renewing user session', error);
-        res.status(500).json('Error renewing user session ' + error);
+        console.error('Error checking and/or renewing user session', error);
+        res.status(500).json('Error checking and/or renewing user session ' + error);
     }
 });
 module.exports = router;
