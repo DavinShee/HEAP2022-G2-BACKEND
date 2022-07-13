@@ -13,8 +13,8 @@ router.get('/:email', async (req, res) => {
             throw new Error('Missing email');
         }
         const email = req.params.email;
-        const pageSize = Number(req.query['page-size']);
-        const pageNum = Number(req.query['page-num']);
+        const pageSize = Number(req.query['page-size']) || 6;
+        const pageNum = Number(req.query['page-num']) || 1;
 
         const conditions = { email: email };
         const [

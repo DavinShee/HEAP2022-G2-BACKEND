@@ -16,8 +16,8 @@ router.get('/', async (req, res) => {
         const profName = req.query['prof-name'];
         const authorName = req.query['author-name'];
         const email = req.query['email'];
-        const pageSize = Number(req.query['page-size']);
-        const pageNum = Number(req.query['page-num']);
+        const pageSize = Number(req.query['page-size']) || 6;
+        const pageNum = Number(req.query['page-num']) || 1;
 
         const conditions = {};
         if (modId) conditions.modId = modId;
@@ -174,8 +174,8 @@ router.patch('/:id', async (req, res) => {
                 ':' +
                 today.getSeconds();
             var dateTime = date + ' ' + time;
-            comment.dateTime = dateTime
-            
+            comment.dateTime = dateTime;
+
             const [error, note] = await addComments(id, comment);
             if (error) throw new Error('Error adding comment', error);
         }
