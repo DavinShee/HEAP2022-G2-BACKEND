@@ -77,6 +77,15 @@ module.exports = {
             return [error, null];
         }
     },
+    deleteAllNotes: async () => {
+        try {
+            await notesModel.deleteMany({});
+            return [undefined, true];
+        } catch (error) {
+            console.error('Error delete all notes', error);
+            return [error, null];
+        }
+    },
     // logging the user in
     findUser: async (conditions) => {
         try {
@@ -123,9 +132,7 @@ module.exports = {
                 user = await user.save();
                 return [undefined, user];
             } else {
-                console.error(
-                    'Error creating account as email is taken'
-                );
+                console.error('Error creating account as email is taken');
                 error = 'Email is taken';
                 return [error, null];
             }

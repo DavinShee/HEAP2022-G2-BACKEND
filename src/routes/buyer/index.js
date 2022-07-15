@@ -5,7 +5,8 @@ const {
     findAllNotes,
     createNote,
     findAndUpdateNote,
-    findAndDeleteNote
+    findAndDeleteNote,
+    deleteAllNotes
 } = require('../../utils/index');
 
 const router = express.Router();
@@ -202,6 +203,26 @@ router.patch('/:id', async (req, res) => {
     } catch (error) {
         console.error('Error getting notes', error);
         res.status(500).json('Error getting notes ' + error);
+    }
+});
+
+router.delete('/', async (req, res) => {
+    try {
+        const [error, deleteSuccess] = await deleteAllNotes();
+        if (error) {
+            throw new Error('Error deleting all notes', error);
+        }
+        const response = {
+            status: 200,
+            timestamp: moment().format(),
+            data: {
+                deleteSuccess
+            }
+        };
+        res.json(response);
+    } catch (error) {
+        console.error('Error deleting all notes', error);
+        res.status(500).json('Error deleting all notes ' + error);
     }
 });
 
