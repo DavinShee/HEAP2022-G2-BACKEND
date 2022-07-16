@@ -31,7 +31,7 @@ router.get('/', async (req, res) => {
         const [findAllNotesError, notes, numberOfNotes, hasNext] =
             await findAllNotes(conditions, pageNum, pageSize);
         if (findAllNotesError) {
-            throw new Error('Error retrieving all notes', conditions);
+            throw new Error(findAllNotesError, conditions);
         }
         const response = {
             status: 200,
@@ -60,7 +60,7 @@ router.get('/:id', async (req, res) => {
         let conditions = { _id: id };
         const [findNoteError, note] = await findAllNotes(conditions);
         if (findNoteError) {
-            throw new Error('Error retrieving similar notes', conditions);
+            throw new Error(findNoteError, conditions);
         }
 
         const modId = note[0].modId;
@@ -69,7 +69,7 @@ router.get('/:id', async (req, res) => {
         conditions = { modId, _id: { $ne: id } };
         const [findAllNotesError, notes] = await findAllNotes(conditions);
         if (findAllNotesError) {
-            throw new Error('Error retrieving similar notes', conditions);
+            throw new Error(findAllNotesError, conditions);
         }
         const response = {
             status: 200,
@@ -178,7 +178,7 @@ router.patch('/:id', async (req, res) => {
             comment.dateTime = dateTime;
 
             const [error, note] = await addComments(id, comment);
-            if (error) throw new Error('Error adding comment', error);
+            if (error) throw new Error(error, error);
         }
 
         if (authorName) update.authorName = authorName;
@@ -190,7 +190,7 @@ router.patch('/:id', async (req, res) => {
         if (year) update.year = year;
         const [error, note] = await findAndUpdateNote(conditions, update);
         if (error) {
-            throw new Error('Error updating all notes', conditions);
+            throw new Error(error, conditions);
         }
         const response = {
             status: 200,
@@ -210,7 +210,7 @@ router.delete('/', async (req, res) => {
     try {
         const [error, deleteSuccess] = await deleteAllNotes();
         if (error) {
-            throw new Error('Error deleting all notes', error);
+            throw new Error(error, error);
         }
         const response = {
             status: 200,
@@ -238,7 +238,7 @@ router.delete('/:id', async (req, res) => {
 
         const [error, note] = await findAndDeleteNote(conditions);
         if (error) {
-            throw new Error('Error deleting note', conditions);
+            throw new Error(error, conditions);
         }
         const response = {
             status: 200,

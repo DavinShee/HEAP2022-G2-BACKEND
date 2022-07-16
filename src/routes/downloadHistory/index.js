@@ -24,7 +24,7 @@ router.get('/:email', async (req, res) => {
             hasNext
         ] = await findAllDownloadHistory(conditions, pageNum, pageSize);
         if (findAllDownloadHistoryError) {
-            throw new Error('Error retrieving all downloadHistory', conditions);
+            throw new Error(findAllDownloadHistoryError, conditions);
         }
         const response = {
             status: 200,
@@ -52,7 +52,7 @@ router.post('/', async (req, res) => {
         const [createDownloadHistoryError, downloadHistory] =
             await createDownloadHistory(email, note);
         if (createDownloadHistoryError) {
-            throw new Error('Error creating downloadHistory', email, note);
+            throw new Error(createDownloadHistoryError, email, note);
         }
         const response = {
             status: 200,

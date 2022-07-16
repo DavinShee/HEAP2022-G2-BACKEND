@@ -31,10 +31,7 @@ router.post('/signin', async (req, res) => {
         const [findUserError, user] = await findUser(conditions);
 
         if (findUserError) {
-            throw new Error(
-                'Error retrieving account as user does not exist or wrong password',
-                conditions
-            );
+            throw new Error(findUserError, conditions);
         }
 
         // creating and starting the tracking of user log in
@@ -147,10 +144,7 @@ router.patch('/edit', async (req, res) => {
                 update
             ); // the password is the original plain text password. To be compared with database password for authentication before changing password
             if (error) {
-                throw new Error(
-                    "Error updating user's account password",
-                    conditions
-                );
+                throw new Error(error, conditions);
             }
             const response = {
                 status: 200,
@@ -174,15 +168,19 @@ router.delete('/:email', async (req, res) => {
             throw new Error('Missing parameters');
         }
 
-        const [error, user] = await findAndDeleteUser({ email: req.params.email });
+        const [error, user] = await findAndDeleteUser({
+            email: req.params.email
+        });
         if (error) {
-            throw new Error('Error deleting account', req.params.email);
+            throw new Error(error, req.params.email);
         }
 
         // deleting user session
-        const [sessionError, userSession] = await deletingSession({ email: req.params.email });
+        const [sessionError, userSession] = await deletingSession({
+            email: req.params.email
+        });
         if (sessionError) {
-            throw new Error('Error deleting account', req.params.email);
+            throw new Error(sessionError, req.params.email);
         }
 
         const response = {
@@ -233,11 +231,10 @@ router.patch('/:email', async (req, res) => {
         }
 
         // checking if session is valid
-        const [checkingError, checkingUserSession] = await loginSessionValidation(
-            req.params.email
-        );
+        const [checkingError, checkingUserSession] =
+            await loginSessionValidation(req.params.email);
         if (checkingError) {
-            throw new Error('Error checking user session', req.params.email);
+            throw new Error(checkingError, req.params.email);
         }
 
         // updating the session
@@ -245,7 +242,7 @@ router.patch('/:email', async (req, res) => {
             req.params.email
         );
         if (updateError) {
-            throw new Error('Error renewing user session', req.params.email);
+            throw new Error(updateError, req.params.email);
         }
 
         const response = {
@@ -258,7 +255,9 @@ router.patch('/:email', async (req, res) => {
         res.json(response);
     } catch (error) {
         console.error('Error checking and/or renewing user session', error);
-        res.status(500).json('Error checking and/or renewing user session ' + error);
+        res.status(500).json(
+            'Error checking and/or renewing user session ' + error
+        );
     }
 });
 module.exports = router;

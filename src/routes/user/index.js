@@ -1,24 +1,21 @@
 const express = require('express');
 const moment = require('moment');
-const {
-    findUserByEmail
-} = require('../../utils/user.js');
+const { findUserByEmail } = require('../../utils/user.js');
 
 const router = express.Router();
-
 
 // getting user by email
 router.get('/:email', async (req, res) => {
     try {
-        if (
-            !req.params.email
-        ) {
+        if (!req.params.email) {
             throw new Error('Missing parameters');
         }
 
-        const [error, user] = await findUserByEmail({ email: req.params.email });
+        const [error, user] = await findUserByEmail({
+            email: req.params.email
+        });
         if (error) {
-            throw new Error('Error getting user', conditions);
+            throw new Error(error, conditions);
         }
 
         const response = {
