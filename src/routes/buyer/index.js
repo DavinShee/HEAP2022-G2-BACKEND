@@ -161,24 +161,29 @@ router.patch('/:id', async (req, res) => {
 
         // adding comments
         if (comment) {
-            var today = new Date();
-            var date =
-                today.getFullYear() +
-                '-' +
-                (today.getMonth() + 1) +
-                '-' +
-                today.getDate();
-            var time =
-                today.getHours() +
-                ':' +
-                today.getMinutes() +
-                ':' +
-                today.getSeconds();
-            var dateTime = date + ' ' + time;
-            comment.dateTime = dateTime;
+            if (comment.email && comment.fullname && comment.comment){
+                var today = new Date();
+                var date =
+                    today.getFullYear() +
+                    '-' +
+                    (today.getMonth() + 1) +
+                    '-' +
+                    today.getDate();
+                var time =
+                    today.getHours() +
+                    ':' +
+                    today.getMinutes() +
+                    ':' +
+                    today.getSeconds();
+                var dateTime = date + ' ' + time;
+                comment.dateTime = dateTime;
 
-            const [error, note] = await addComments(id, comment);
-            if (error) throw new Error(error, error);
+                const [error, note] = await addComments(id, comment);
+                if (error) throw new Error(error, error);
+            }
+            else {
+                throw new Error('Missing email and/or email and/or comment as parameter');
+            }
         }
 
         if (authorName) update.authorName = authorName;
