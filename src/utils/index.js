@@ -62,7 +62,6 @@ module.exports = {
                     new: true
                 })
                 .exec();
-            doc.comments = doc.comments.reverse();
             return [undefined, doc];
         } catch (error) {
             console.error('Error updating note', error);

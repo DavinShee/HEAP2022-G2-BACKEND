@@ -8,7 +8,7 @@ module.exports = {
                 if (userComments.comments.filter( e=> e.email === comment.email).length == 0) {
                     let doc = await notesModel.findOneAndUpdate(
                         { _id: id },
-                        { $push: { comments: comment } },
+                        { $push: { comments: { $each: [comment], $position: 0 } } },
                         {
                             new: true
                         }
