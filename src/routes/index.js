@@ -3,6 +3,7 @@ const buyerRoute = require('./buyer/index');
 const accountRoute = require('./account/index');
 const downloadHistory = require('./downloadHistory/index');
 const userRoute = require('./user/index');
+const ratingRoute = require('./rating/index');
 
 const router = express.Router();
 
@@ -11,5 +12,6 @@ router.use('/buyer', buyerRoute);
 router.use('/account', accountRoute);
 router.use('/downloadHistory', downloadHistory);
 router.use('/user', userRoute);
+router.use('/rating', ratingRoute);
 
 module.exports = router;
