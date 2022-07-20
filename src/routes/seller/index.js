@@ -1,7 +1,7 @@
 const express = require('express');
 const moment = require('moment');
 
-const { createDocument } = require('../../utils/documents');
+const { createDocument, retrieveDocument } = require('../../utils/documents');
 
 const router = express.Router();
 
@@ -30,6 +30,31 @@ router.post('/', async (req, res) => {
     } catch (error) {
         console.error('Error creating document', error);
         res.status(500).json(`Error creating document: ${error}`);
+    }
+});
+
+router.get('/:noteId', async (req, res) => {
+    try {
+        if (!req.params.noteId) {
+            throw new Error('Missing parameters');
+        }
+        const noteId = req.params.noteId;
+        const [retrieveDocumentError, document] = await retrieveDocument(
+            noteId
+        );
+        if (retrieveDocumentError) throw new Error(retrieveDocumentError);
+
+        const response = {
+            status: 200,
+            timestamp: moment().format(),
+            data: {
+                document
+            }
+        };
+        res.json(response);
+    } catch (error) {
+        console.error('Error retrieving document', error);
+        res.status(500).json(`Error retrieving document: ${error}`);
     }
 });
 
