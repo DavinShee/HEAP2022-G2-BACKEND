@@ -1,9 +1,6 @@
 const express = require('express');
 const moment = require('moment');
-const {
-    updateAndGetAverageRating, 
-    getAverageRating
-} = require('../../utils/rating');
+const {Rating} = require('../../utils');
 
 const router = express.Router();
 
@@ -17,7 +14,7 @@ router.post('/', async (req, res) => {
         const rating = req.body.rating;
 
         const conditions = { noteId: noteId };
-        const [updateAndGetAverageRatingError, averageRating] = await updateAndGetAverageRating(conditions, rating);
+        const [updateAndGetAverageRatingError, averageRating] = await Rating.updateAndGetAverageRating(conditions, rating);
         if (updateAndGetAverageRatingError) {
             throw new Error(updateAndGetAverageRatingError, conditions);
         }
@@ -43,7 +40,7 @@ router.get('/:id', async (req, res) => {
         const noteId = req.params.id;
         
         const conditions = { noteId: noteId };
-        const [getAverageRatingError, averageRating] = await getAverageRating(conditions);
+        const [getAverageRatingError, averageRating] = await Rating.getAverageRating(conditions);
         if (getAverageRatingError) {
             throw new Error(getAverageRatingError, conditions);
         }

@@ -1,21 +1,7 @@
-const { Router } = require('express');
 const express = require('express');
-const res = require('express/lib/response');
-const { type } = require('express/lib/response');
 const moment = require('moment');
-const {
-    findUser,
-    createUser,
-    findAndUpdateUser,
-    findAndDeleteUser
-} = require('../../utils/index');
+const {User,Login} = require('../../utils/index');
 const bcrypt = require('bcrypt');
-const {
-    loginSessionStart,
-    loginSessionRenewal,
-    loginSessionValidation,
-    deletingSession
-} = require('../../utils/login');
 
 const router = express.Router();
 
@@ -28,14 +14,14 @@ router.post('/signin', async (req, res) => {
         const conditions = {};
         if (email) conditions.email = email;
         if (password) conditions.password = password;
-        const [findUserError, user] = await findUser(conditions);
+        const [findUserError, user] = await User.findUser(conditions);
 
         if (findUserError) {
             throw new Error(findUserError, conditions);
         }
 
         // creating and starting the tracking of user log in
-        const [createSessionError, userSession] = await loginSessionStart(
+        const [createSessionError, userSession] = await Login.loginSessionStart(
             email
         );
         if (createSessionError) {
@@ -81,7 +67,7 @@ router.post('/signup', async (req, res) => {
             today.getSeconds();
         var dateTime = date + ' ' + time;
 
-        const [createAccountError, user] = await createUser(
+        const [createAccountError, user] = await User.createUser(
             email,
             fullname,
             password,
@@ -92,7 +78,7 @@ router.post('/signup', async (req, res) => {
         }
 
         // creating and starting the tracking of user log in
-        const [createSessionError, userSession] = await loginSessionStart(
+        const [createSessionError, userSession] = await Login.loginSessionStart(
             email
         );
         if (createSessionError) {
@@ -122,7 +108,7 @@ router.patch('/edit', async (req, res) => {
         const newPassword = req.body.newPassword;
 
         // updating user session
-        const [createSessionError, userSession] = await loginSessionRenewal(
+        const [createSessionError, userSession] = await Login.loginSessionRenewal(
             email
         );
         if (createSessionError) {
@@ -138,7 +124,7 @@ router.patch('/edit', async (req, res) => {
             const salt = await bcrypt.genSalt(10);
             update.password = await bcrypt.hash(newPassword, salt);
 
-            const [error, user] = await findAndUpdateUser(
+            const [error, user] = await User.findAndUpdateUser(
                 conditions,
                 password,
                 update
@@ -168,7 +154,7 @@ router.delete('/:email', async (req, res) => {
             throw new Error('Missing parameters');
         }
 
-        const [error, user] = await findAndDeleteUser({
+        const [error, user] = await User.findAndDeleteUser({
             email: req.params.email
         });
         if (error) {
@@ -176,7 +162,7 @@ router.delete('/:email', async (req, res) => {
         }
 
         // deleting user session
-        const [sessionError, userSession] = await deletingSession({
+        const [sessionError, userSession] = await Login.deletingSession({
             email: req.params.email
         });
         if (sessionError) {
@@ -232,13 +218,13 @@ router.patch('/:email', async (req, res) => {
 
         // checking if session is valid
         const [checkingError, checkingUserSession] =
-            await loginSessionValidation(req.params.email);
+            await Login.loginSessionValidation(req.params.email);
         if (checkingError) {
             throw new Error(checkingError, req.params.email);
         }
 
         // updating the session
-        const [updateError, updatingUserSession] = await loginSessionRenewal(
+        const [updateError, updatingUserSession] = await Login.loginSessionRenewal(
             req.params.email
         );
         if (updateError) {

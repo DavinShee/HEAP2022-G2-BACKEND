@@ -1,13 +1,7 @@
 const express = require('express');
 const moment = require('moment');
-const { addComments } = require('../../utils/comment');
-const {
-    findAllNotes,
-    createNote,
-    findAndUpdateNote,
-    findAndDeleteNote,
-    deleteAllNotes,
-} = require('../../utils/index');
+const { Comment, Note } = require('../../utils');
+
 const {incrementDownload} = require('../../utils/downloadTracker');
 
 const router = express.Router();
@@ -30,7 +24,7 @@ router.get('/', async (req, res) => {
         if (email) conditions.email = email;
 
         const [findAllNotesError, notes, numberOfNotes, hasNext] =
-            await findAllNotes(conditions, pageNum, pageSize);
+            await Note.findAllNotes(conditions, pageNum, pageSize);
         if (findAllNotesError) {
             throw new Error(findAllNotesError, conditions);
         }
@@ -59,7 +53,7 @@ router.get('/:id', async (req, res) => {
         const id = req.params.id;
         // get current note
         let conditions = { _id: id };
-        const [findNoteError, note] = await findAllNotes(conditions);
+        const [findNoteError, note] = await Note.findAllNotes(conditions);
         if (findNoteError) {
             throw new Error(findNoteError, conditions);
         }
@@ -68,7 +62,7 @@ router.get('/:id', async (req, res) => {
 
         // get all notes with the same modId
         conditions = { modId, _id: { $ne: id } };
-        const [findAllNotesError, notes] = await findAllNotes(conditions);
+        const [findAllNotesError, notes] = await Note.findAllNotes(conditions);
         if (findAllNotesError) {
             throw new Error(findAllNotesError, conditions);
         }
@@ -113,7 +107,7 @@ router.post('/', async (req, res) => {
         const comments = [];
         const download = 0;
 
-        const [createNoteError, note] = await createNote(
+        const [createNoteError, note] = await Note.createNote(
             authorName,
             comments,
             description,
@@ -187,7 +181,7 @@ router.patch('/:id', async (req, res) => {
                 var dateTime = date + ' ' + time;
                 comment.dateTime = dateTime;
 
-                const [error,] = await addComments(id, comment);
+                const [error,] = await Comment.addComments(id, comment);
                 if (error) throw new Error(error, error);
             }
             else {
@@ -202,7 +196,7 @@ router.patch('/:id', async (req, res) => {
         if (price) update.price = price;
         if (profName) update.profName = profName;
         if (year) update.year = year;
-        const [error, note] = await findAndUpdateNote(conditions, update);
+        const [error, note] = await Note.findAndUpdateNote(conditions, update);
         if (error) {
             throw new Error(error, conditions);
         }
@@ -222,7 +216,7 @@ router.patch('/:id', async (req, res) => {
 
 router.delete('/', async (req, res) => {
     try {
-        const [error, deleteSuccess] = await deleteAllNotes();
+        const [error, deleteSuccess] = await Note.deleteAllNotes();
         if (error) {
             throw new Error(error, error);
         }
@@ -250,7 +244,7 @@ router.delete('/:id', async (req, res) => {
             _id: req.params.id
         };
 
-        const [error, note] = await findAndDeleteNote(conditions);
+        const [error, note] = await Note.findAndDeleteNote(conditions);
         if (error) {
             throw new Error(error, conditions);
         }
