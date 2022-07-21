@@ -185,7 +185,7 @@ router.patch('/:id', async (req, res) => {
                 if (error) throw new Error(error, error);
             }
             else {
-                throw new Error('Missing email and/or email and/or comment as parameter');
+                throw new Error('Missing email and/or fullname and/or comment content as parameter');
             }
         }
 
