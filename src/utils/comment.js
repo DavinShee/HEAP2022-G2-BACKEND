@@ -3,11 +3,16 @@ const notesModel = require('../models/notes');
 module.exports = {
     addComments: async (id, comment) => {
         try {
-            let userComments = await notesModel.findOne({ _id: id })
+            let userComments = await notesModel.findOne({ _id: id });
             if (userComments) {
-                if (userComments.comments.filter( e => e.email === comment.email).length != 0) { 
+                if (
+                    userComments.comments.filter(
+                        (e) => e.email === comment.email
+                    ).length != 0
+                ) {
                     // comment has already been added
-                    error = "user has already uploaded comment on this post before";
+                    error =
+                        'user has already uploaded comment on this post before';
                     console.error(error);
                     return [error, null];
                 }
@@ -20,11 +25,12 @@ module.exports = {
                     }
                 );
                 return [undefined, doc];
-            } else { 
+            } else {
                 // could not get note: note with that id does not exist
-                error = "Error getting note";
+                error = 'Error getting note';
                 console.error('Error adding comment to note', error);
                 return [error, null];
+                console.log('test');
             }
         } catch (error) {
             console.error('Error adding comment to note', error);

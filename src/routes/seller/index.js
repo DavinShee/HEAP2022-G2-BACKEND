@@ -1,7 +1,7 @@
 const express = require('express');
 const moment = require('moment');
 
-const { createDocument, retrieveDocument } = require('../../utils/documents');
+const { Documents } = require('../../utils');
 
 const router = express.Router();
 
@@ -12,7 +12,7 @@ router.post('/', async (req, res) => {
         }
         const noteId = req.body.noteId;
         const document = req.body.document;
-        const [createDocumentError, createdDocument] = await createDocument(
+        const [createDocumentError, createdDocument] = await Documents.createDocument(
             noteId,
             document
         );
@@ -39,7 +39,7 @@ router.get('/:noteId', async (req, res) => {
             throw new Error('Missing parameters');
         }
         const noteId = req.params.noteId;
-        const [retrieveDocumentError, document] = await retrieveDocument(
+        const [retrieveDocumentError, document] = await Documents.retrieveDocument(
             noteId
         );
         if (retrieveDocumentError) throw new Error(retrieveDocumentError);
