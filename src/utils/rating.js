@@ -4,12 +4,11 @@ module.exports = {
     updateAndGetAverageRating: async (conditions, rating) => {
         try {
             const currRating = await ratingModel.findOne(conditions).exec();
-            if (!currRating){
-                var newTotal = Number(rating);
-                var newTotalNumber = 1;
-            } else {
-                var newTotal = currRating.totalRating + Number(rating);
-                var newTotalNumber = currRating.totalNumberOfRating + 1;
+            let newTotal = Number(rating);
+            let newTotalNumber = 1;
+            if (currRating){
+                newTotal = currRating.totalRating + Number(rating);
+                newTotalNumber = currRating.totalNumberOfRating + 1;
             }
             const updated = await ratingModel.updateOne(conditions, { totalRating: newTotal, totalNumberOfRating: newTotalNumber }, { upsert: true }).exec();
             const updatedRating = await ratingModel.findOne(conditions).exec();
@@ -23,11 +22,10 @@ module.exports = {
     getAverageRating: async (conditions) => {
         try {
             const rating = await ratingModel.findOne(conditions).exec();
+            let averageRating = 0;
             if (rating){
-                var averageRating = Number(rating.totalRating) / Number(rating.totalNumberOfRating);
-            } else {
-                var averageRating = 0;
-            }
+                averageRating = Number(rating.totalRating) / Number(rating.totalNumberOfRating);
+            } 
             return [null, averageRating];
         } catch (error) {
             console.error('Error getting average rating to note', conditions, error);

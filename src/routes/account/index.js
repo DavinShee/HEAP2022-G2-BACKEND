@@ -58,7 +58,6 @@ router.post('/signin', async (req, res) => {
 });
 // signing up the user (creating account)
 router.post('/signup', async (req, res) => {
-    // note that the frontend has to route to signup
     try {
         if (!req.body.email || !req.body.fullname || !req.body.password) {
             throw new Error('Missing parameters');

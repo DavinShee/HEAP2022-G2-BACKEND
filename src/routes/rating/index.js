@@ -9,8 +9,8 @@ const router = express.Router();
 
 router.post('/', async (req, res) => {
     try {
-        if (!req.body.noteId && !req.body.rating) {
-            throw new Error('Missing noteId or rating');
+        if (!req.body.noteId || !req.body.rating) {
+            throw new Error('Missing noteId and/or rating');
         }
 
         const noteId = req.body.noteId;
