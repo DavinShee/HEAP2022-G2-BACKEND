@@ -1,4 +1,5 @@
 const usersModel = require('../models/user');
+const bcrypt = require('bcrypt');
 
 module.exports = {
     // finding user by email only 
