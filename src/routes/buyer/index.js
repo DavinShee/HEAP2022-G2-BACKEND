@@ -6,8 +6,9 @@ const {
     createNote,
     findAndUpdateNote,
     findAndDeleteNote,
-    deleteAllNotes
+    deleteAllNotes,
 } = require('../../utils/index');
+const {incrementDownload} = require('../../utils/downloadTracker');
 
 const router = express.Router();
 
@@ -110,11 +111,13 @@ router.post('/', async (req, res) => {
         const profName = req.body.profName;
         const year = req.body.year;
         const comments = [];
+        const download = 0;
 
         const [createNoteError, note] = await createNote(
             authorName,
             comments,
             description,
+            download,
             email,
             image,
             modId,
@@ -153,11 +156,17 @@ router.patch('/:id', async (req, res) => {
         const price = req.body.price || undefined;
         const profName = req.body.profName || undefined;
         const year = req.body.year || undefined;
+        const increaseDownload = req.body.increaseDownload || false;
 
         const update = {};
         const conditions = {
             _id: id
         };
+        // increment download by 1
+        if (increaseDownload) {
+            const [findAndUpdateNoteError,] = await incrementDownload(id)
+            if (findAndUpdateNoteError) throw new Error(findAndUpdateNoteError, conditions);
+        }
 
         // adding comments
         if (comment) {
@@ -178,7 +187,7 @@ router.patch('/:id', async (req, res) => {
                 var dateTime = date + ' ' + time;
                 comment.dateTime = dateTime;
 
-                const [error, note] = await addComments(id, comment);
+                const [error,] = await addComments(id, comment);
                 if (error) throw new Error(error, error);
             }
             else {

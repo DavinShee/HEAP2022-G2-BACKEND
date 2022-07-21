@@ -39,7 +39,8 @@ module.exports = {
                 note: note
             });
             if (download) throw new Error('DownloadHistory already exists');
-
+            
+            // create new download history
             const doc = {
                 email,
                 note
