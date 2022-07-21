@@ -30,7 +30,6 @@ module.exports = {
                 error = 'Error getting note';
                 console.error('Error adding comment to note', error);
                 return [error, null];
-                console.log('test');
             }
         } catch (error) {
             console.error('Error adding comment to note', error);
