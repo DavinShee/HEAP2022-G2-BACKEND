@@ -1,7 +1,7 @@
 const express = require('express');
 const moment = require('moment');
 require('dotenv').config();
-const { Comment, Note } = require('../../utils');
+const { Comment, Note, CloudinaryDocument } = require('../../utils');
 const { incrementDownload } = require('../../utils/downloadTracker');
 
 const router = express.Router();
@@ -108,17 +108,18 @@ router.post('/', async (req, res) => {
         const description = req.body.description;
         const email = req.body.email;
         const image = req.body.image;
-        let url;
-        await cloudinary.uploader.upload(image, function (error, result) {
-            url = result.secure_url;
-        });
-
         const modId = req.body.modId;
         const price = req.body.price;
         const profName = req.body.profName;
         const year = req.body.year;
         const comments = [];
         const download = 0;
+
+        const [createCloudinaryUrlError, url] =
+            await CloudinaryDocument.createUrl(image);
+        if (createCloudinaryUrlError) {
+            throw new Error(createCloudinaryUrlError);
+        }
 
         const [createNoteError, note] = await Note.createNote(
             authorName,
