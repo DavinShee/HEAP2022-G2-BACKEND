@@ -32,6 +32,7 @@ module.exports = {
         modId,
         price,
         profName,
+        url,
         year
     ) => {
         try {
@@ -45,6 +46,7 @@ module.exports = {
                 modId,
                 price,
                 profName,
+                url,
                 year
             };
             let note = new notesModel(doc);
@@ -85,5 +87,5 @@ module.exports = {
             console.error('Error delete all notes', error);
             return [error, null];
         }
-    },
-}
+    }
+};

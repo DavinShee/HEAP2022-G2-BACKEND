@@ -1,10 +1,18 @@
 const express = require('express');
 const moment = require('moment');
+require('dotenv').config();
 const { Comment, Note } = require('../../utils');
-
-const {incrementDownload} = require('../../utils/downloadTracker');
+const { incrementDownload } = require('../../utils/downloadTracker');
 
 const router = express.Router();
+const cloudinary = require('cloudinary').v2;
+
+cloudinary.config({
+    cloud_name: process.env.CLOUNDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUNDINARY_API_KEY,
+    api_secret: process.env.CLOUNDINARY_API_SECRET,
+    secure: true
+});
 
 router.get('/', async (req, res) => {
     try {
@@ -100,6 +108,11 @@ router.post('/', async (req, res) => {
         const description = req.body.description;
         const email = req.body.email;
         const image = req.body.image;
+        let url;
+        await cloudinary.uploader.upload(image, function (error, result) {
+            url = result.secure_url;
+        });
+
         const modId = req.body.modId;
         const price = req.body.price;
         const profName = req.body.profName;
@@ -117,6 +130,7 @@ router.post('/', async (req, res) => {
             modId,
             price,
             profName,
+            url,
             year
         );
         if (createNoteError) {
@@ -158,13 +172,14 @@ router.patch('/:id', async (req, res) => {
         };
         // increment download by 1
         if (increaseDownload) {
-            const [findAndUpdateNoteError,] = await incrementDownload(id)
-            if (findAndUpdateNoteError) throw new Error(findAndUpdateNoteError, conditions);
+            const [findAndUpdateNoteError] = await incrementDownload(id);
+            if (findAndUpdateNoteError)
+                throw new Error(findAndUpdateNoteError, conditions);
         }
 
         // adding comments
         if (comment) {
-            if (comment.email && comment.fullname && comment.comment){
+            if (comment.email && comment.fullname && comment.comment) {
                 var today = new Date();
                 var date =
                     today.getFullYear() +
@@ -181,11 +196,12 @@ router.patch('/:id', async (req, res) => {
                 var dateTime = date + ' ' + time;
                 comment.dateTime = dateTime;
 
-                const [error,] = await Comment.addComments(id, comment);
+                const [error] = await Comment.addComments(id, comment);
                 if (error) throw new Error(error, error);
-            }
-            else {
-                throw new Error('Missing email and/or fullname and/or comment content as parameter');
+            } else {
+                throw new Error(
+                    'Missing email and/or fullname and/or comment content as parameter'
+                );
             }
         }
 

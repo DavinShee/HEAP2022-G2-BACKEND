@@ -11,6 +11,7 @@ const noteSchema = new mongoose.Schema(
         modId: { type: String, required: true },
         price: { type: Number, required: false },
         profName: { type: String, required: true },
+        url: { type: String, required: false },
         year: { type: String, required: true }
     },
     { timestamps: true }
