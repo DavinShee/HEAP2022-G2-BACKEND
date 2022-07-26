@@ -33,7 +33,8 @@ module.exports = {
         price,
         profName,
         url,
-        year
+        year,
+        rating
     ) => {
         try {
             const doc = {
@@ -47,7 +48,8 @@ module.exports = {
                 price,
                 profName,
                 url,
-                year
+                year,
+                rating
             };
             let note = new notesModel(doc);
             note = await note.save();
