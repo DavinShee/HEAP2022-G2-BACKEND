@@ -114,6 +114,7 @@ router.post('/', async (req, res) => {
         const year = req.body.year;
         const comments = [];
         const download = 0;
+        const rating = 0;
 
         const [createCloudinaryUrlError, url] =
             await CloudinaryDocument.createUrl(image);
@@ -132,7 +133,8 @@ router.post('/', async (req, res) => {
             price,
             profName,
             url,
-            year
+            year,
+            rating
         );
         if (createNoteError) {
             throw createNoteError;

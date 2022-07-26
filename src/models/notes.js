@@ -12,7 +12,8 @@ const noteSchema = new mongoose.Schema(
         price: { type: Number, required: false },
         profName: { type: String, required: true },
         url: { type: String, required: false },
-        year: { type: String, required: true }
+        year: { type: String, required: true },
+        rating: { type: Number, required: true }
     },
     { timestamps: true }
 );
