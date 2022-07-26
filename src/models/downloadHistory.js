@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const downloadHistorySchema = new mongoose.Schema(
     {
         email: { type: String, required: true },
-        note: { type: Object, required: true }
+        noteId: { type: String, required: true }
     },
     { timestamps: true }
 );

@@ -48,11 +48,11 @@ router.post('/', async (req, res) => {
             throw new Error('Missing email');
         }
         const email = req.body.email;
-        const note = req.body.note;
+        const noteId = req.body.noteId;
         const [createDownloadHistoryError, downloadHistory] =
-            await createDownloadHistory(email, note);
+            await createDownloadHistory(email, noteId);
         if (createDownloadHistoryError) {
-            throw new Error(createDownloadHistoryError, email, note);
+            throw new Error(createDownloadHistoryError);
         }
         const response = {
             status: 200,

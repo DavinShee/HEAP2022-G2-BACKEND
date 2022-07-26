@@ -4,7 +4,7 @@ const { User } = require('../../utils');
 
 const router = express.Router();
 
-// getting user by email
+// getting user by email (used when more details of user is needed)
 router.get('/:email', async (req, res) => {
     try {
         if (!req.params.email) {

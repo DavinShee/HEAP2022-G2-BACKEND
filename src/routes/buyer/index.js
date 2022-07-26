@@ -14,6 +14,7 @@ cloudinary.config({
     secure: true
 });
 
+// getting all the notes
 router.get('/', async (req, res) => {
     try {
         const modId = req.query['mod-id'];
@@ -153,6 +154,7 @@ router.post('/', async (req, res) => {
     }
 });
 
+// updating the note
 router.patch('/:id', async (req, res) => {
     try {
         if (!req.params.id) {
@@ -180,7 +182,7 @@ router.patch('/:id', async (req, res) => {
                 throw new Error(findAndUpdateNoteError, conditions);
         }
 
-        // adding comments
+        // adding comments to the note model
         if (comment) {
             if (comment.email && comment.fullname && comment.comment) {
                 var today = new Date();
@@ -233,6 +235,7 @@ router.patch('/:id', async (req, res) => {
     }
 });
 
+// deleting all notes
 router.delete('/', async (req, res) => {
     try {
         const [error, deleteSuccess] = await Note.deleteAllNotes();
@@ -253,6 +256,7 @@ router.delete('/', async (req, res) => {
     }
 });
 
+// deleting note by id
 router.delete('/:id', async (req, res) => {
     try {
         if (!req.params.id) {
