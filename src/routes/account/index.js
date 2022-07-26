@@ -181,33 +181,7 @@ router.delete('/:email', async (req, res) => {
         res.status(500).json('Error deleting account ' + error);
     }
 });
-// checking if the user is logged in
-// router.get('/:email', async (req, res) => {
-//     try {
-//         if (!req.params.email) {
-//             throw new Error('Missing parameters');
-//         }
 
-//         const [error, userSession] = await loginSessionValidation(
-//             req.params.email
-//         );
-//         if (error) {
-//             throw new Error('Error checking user session', req.params.email);
-//         }
-
-//         const response = {
-//             status: 200,
-//             timestamp: moment().format(),
-//             data: {
-//                 userSession
-//             }
-//         };
-//         res.json(response);
-//     } catch (error) {
-//         console.error('Error checking user session', error);
-//         res.status(500).json('Error checking user session ' + error);
-//     }
-// });
 // extending user session
 router.patch('/:email', async (req, res) => {
     try {

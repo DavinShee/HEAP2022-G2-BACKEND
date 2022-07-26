@@ -7,7 +7,6 @@ module.exports = {
         try {
             let doc = await usersModel.findOne({ email: conditions.email }).exec();
             if (doc) {
-                console.log(doc)
                 return [undefined, doc];
             }
             const error = 'Error getting account';
