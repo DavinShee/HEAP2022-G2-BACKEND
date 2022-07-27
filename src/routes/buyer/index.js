@@ -5,14 +5,6 @@ const { Comment, Note, CloudinaryDocument } = require('../../utils');
 const { incrementDownload } = require('../../utils/downloadTracker');
 
 const router = express.Router();
-const cloudinary = require('cloudinary').v2;
-
-cloudinary.config({
-    cloud_name: process.env.CLOUNDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUNDINARY_API_KEY,
-    api_secret: process.env.CLOUNDINARY_API_SECRET,
-    secure: true
-});
 
 // getting all the notes
 router.get('/', async (req, res) => {
@@ -26,6 +18,8 @@ router.get('/', async (req, res) => {
 
         const conditions = {};
         if (modId) conditions.modId = modId;
+
+        // implement regex for profName and authorName
         if (profName)
             conditions.profName = { $regex: new RegExp(profName, 'i') };
         if (authorName)
@@ -182,7 +176,7 @@ router.patch('/:id', async (req, res) => {
                 throw new Error(findAndUpdateNoteError, conditions);
         }
 
-        // adding comments to the note model
+        // adding comments to the note model with timestamp
         if (comment) {
             if (comment.email && comment.fullname && comment.comment) {
                 var today = new Date();

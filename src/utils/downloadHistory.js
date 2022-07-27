@@ -6,12 +6,15 @@ module.exports = {
         try {
             const noteArray = [];
             const query = downloadHistoryModel.find(conditions, 'noteId');
-            //const query = notesModel.find(conditions);
+
+            // Implement pagination
             if (pageNum) query.skip((pageNum - 1) * pageSize);
             if (pageSize) query.limit(pageSize);
+
             query.sort({ createdAt: -1 });
             const downloadHistory = await query.exec(); // array of noteId
 
+            // Loop through all download histories and retrieve their respective noteId stored in noteArray: String[]
             for (const note of downloadHistory) {
                 const noteId = note.noteId;
                 const noteQuery = notesModel.find({ _id: noteId });
@@ -23,6 +26,8 @@ module.exports = {
                 Object.keys(conditions).length === 0
                     ? await downloadHistoryModel.countDocuments()
                     : await downloadHistoryModel.countDocuments(conditions);
+
+            // Flag to determine presence of a next page
             const hasNext = pageSize
                 ? pageNum * pageSize < numberOfDownloadHistory
                 : false;

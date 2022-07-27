@@ -7,6 +7,7 @@ const Note = require('./note');
 const Rating = require('./rating');
 const User = require('./user');
 const CloudinaryDocument = require('./cloudinaryDocument');
+
 module.exports = {
     Comment,
     CloudinaryDocument,

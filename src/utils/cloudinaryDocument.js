@@ -8,6 +8,7 @@ cloudinary.config({
 });
 
 module.exports = {
+    // generate a public URL for the PDF file based on its base64 dataURL string
     createUrl: async (dataURL) => {
         try {
             let url;

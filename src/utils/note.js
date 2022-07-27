@@ -4,15 +4,19 @@ module.exports = {
     findAllNotes: async (conditions, pageNum, pageSize) => {
         try {
             const query = notesModel.find(conditions);
+            // Implement pagination
             if (pageNum) query.skip((pageNum - 1) * pageSize);
             if (pageSize) query.limit(pageSize);
+
             query.sort({ createdAt: -1 });
             const notes = await query.exec();
+
             const numberOfNotes =
                 // count documents based on conditions or not depending on the number of conditions
                 Object.keys(conditions).length === 0
                     ? await notesModel.countDocuments()
                     : await notesModel.countDocuments(conditions);
+            // Flag to determine presence of a next page
             const hasNext = pageSize
                 ? pageNum * pageSize < numberOfNotes
                 : false;
